@@ -15,6 +15,7 @@ brew "mas"
 brew "openssl"
 brew "python"
 brew "terraform"
+brew "wget"
 brew "zsh"
 
 # Applications installed by homebrew/case
@@ -36,7 +37,6 @@ mas "Between", id: 1320741520
 mas "Day One", id: 1055511498
 mas "KakaoTalk", id: 869223134
 mas "Keynote", id: 409183694
-mas "Melon", id: 1236050766
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Pocket", id: 568494494

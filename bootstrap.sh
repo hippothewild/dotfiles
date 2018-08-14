@@ -1,6 +1,10 @@
 #!/bin/bash
 
-# Check prerequisite
+printmsg() {
+  echo -e "\033[1;34m$1\033[0m"
+}
+
+printmsg "*** Check prerequisite ***"
 if test ! $(which tar); then
   echo 'Install tar/gz to continue.'
   exit 1
@@ -16,28 +20,32 @@ fi
 
 DOTFILE_DIR=$(pwd)
 
-# Install Homebrew
+printmsg "*** Install HomeBrew ***"
 if test ! $(which brew); then
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 fi
 
-# Install binaries and applications via Homebrew
+printmsg "*** Install binaries and applications via Homebrew ***"
 brew update
 brew tap homebrew/bundle
 brew bundle --file=$DOTFILE_DIR/Brewfile
 brew cleanup
 brew cask cleanup
 
-# Set git configuration
+printmsg "*** Set git configuration ***"
 [ ! -f $HOME/.gitconfig ] && ln -nfs $DOTFILE_DIR/gitconfig $HOME/.gitconfig
 
-# Change default shell to zsh, install oh-my-zsh and set configuration
+printmsg "*** Install virtualenvwrapper via pip3 ***"
+pip3 install virtualenvwrapper
+
+printmsg "*** Change default shell to zsh, install oh-my-zsh and set configuration ***"
+echo "$(which zsh)"| sudo tee -a /etc/shells
 chsh -s $(which zsh)
 sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
-[ ! -f $HOME/.zshrc ] && ln -nfs $DOTFILE_DIR/zshrc $HOME/.zshrc
+ln -nfs $DOTFILE_DIR/zshrc $HOME/.zshrc
 source $HOME/.zshrc
 
-# Install Visual Studio Code extensions
+printmsg "*** Install Visual Studio Code extensions ***"
 if test $(which code); then
   code --install-extension eg2.tslint
   code --install-extension mauve.terraform
@@ -45,6 +53,12 @@ if test $(which code); then
   code --install-extension octref.vetur
   code --install-extension PeterJausovec.vscode-docker
 
-  cp $HOME/Library/Application\ Support/Code/User/settings.json $HOME/Library/Application\ Support/Code/User/settings.backup.json
+  if [ -f $HOME/Library/Application\ Support/Code/User/settings.json ]; then
+    cp $HOME/Library/Application\ Support/Code/User/settings.json $HOME/Library/Application\ Support/Code/User/settings.backup.json
+  fi
   cp ./vscode_settings.json $HOME/Library/Application\ Support/Code/User/settings.json
 fi
+
+printmsg "All dotfiles setup completed!"
+
+echo "$(which zsh)"| sudo tee -a /etc/shells
