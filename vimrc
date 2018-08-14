@@ -73,7 +73,3 @@ set smarttab		" Make the tab key insert spaces to go to the next indent
 set encoding=UTF-8
 set nohlsearch		" Stop the highlighting for the 'hlsearch' option
 
-" Plugins
-call plug#begin('~/.vim/plugged')
-Plug 'hashivim/vim-terraform'
-call plug#end()

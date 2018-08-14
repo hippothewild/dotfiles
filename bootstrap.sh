@@ -59,9 +59,10 @@ if test $(which code); then
   cp ./vscode_settings.json $HOME/Library/Application\ Support/Code/User/settings.json
 fi
 
-printmsg "*** Copy Iterm2 profile ***"
+printmsg "*** Copy editor & terminal configurations ***"
 if [ -f $HOME/Library/Application\ Support/iTerm2/DynamicProfiles ]; then
   cp $DOTFILE_DIR/iterm2_settings.json $HOME/Library/Application\ Support/iTerm2/DynamicProfiles
 fi
+ln -nfs $DOTFILE_DIR/vimrc $HOME/.vimrc
 
 printmsg "All dotfiles setup completed!"
