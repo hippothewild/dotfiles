@@ -59,6 +59,9 @@ if test $(which code); then
   cp ./vscode_settings.json $HOME/Library/Application\ Support/Code/User/settings.json
 fi
 
-printmsg "All dotfiles setup completed!"
+printmsg "*** Copy Iterm2 profile ***"
+if [ -f $HOME/Library/Application\ Support/iTerm2/DynamicProfiles ]; then
+  cp $DOTFILE_DIR/iterm2_settings.json $HOME/Library/Application\ Support/iTerm2/DynamicProfiles
+fi
 
-echo "$(which zsh)"| sudo tee -a /etc/shells
+printmsg "All dotfiles setup completed!"
