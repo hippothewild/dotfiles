@@ -6,15 +6,16 @@ tap "homebrew/core"
 
 # Binaries / Libraries
 brew "ack"
-brew "azure-cli"
-brew "cli53"
+brew "awscli"
 brew "go"
 brew "dep"
 brew "docker"
 brew "mas"
+brew "node"
 brew "openssl"
 brew "python"
 brew "terraform"
+brew "tmux"
 brew "wget"
 brew "zsh"
 
