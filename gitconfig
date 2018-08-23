@@ -6,7 +6,7 @@
 	email = jihwan0321@gmail.com
 
 [diff]
-  compactionHeuristic = true
+  indentHeuristic = true
 
 [url "git@github.com:"]
   pushinsteadof = "git://github.com/"
