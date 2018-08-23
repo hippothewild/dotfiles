@@ -3,6 +3,7 @@ dotfiles
 Jihwan Chun's personal dotfiles.
 
 ## How-to
+Bootstrapper script is written for MacOS.
 ```sh
 $ git clone https://github.com/jihwan-chun/dotfiles.git
 $ cd dotfiles
