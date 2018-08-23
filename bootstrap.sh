@@ -54,7 +54,7 @@ brew cask cleanup
 
 
 printmsg "*** Set git configurations ***"
-[ ! -f $HOME/.gitconfig ] && ln -nfs $DOTFILE_DIR/gitconfig $HOME/.gitconfig
+[ ! -f $HOME/.gitconfig ] && ln -nfs $DOTFILE_DIR/.gitconfig $HOME/.gitconfig
 
 
 printmsg "*** Install virtualenvwrapper via pip3 ***"
@@ -68,7 +68,7 @@ sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/to
 if [ -f $HOME/.zshrc ]; then
   cp $HOME/.zshrc $HOME/.zshrc.backup
 fi
-ln -nfs $DOTFILE_DIR/zshrc $HOME/.zshrc
+ln -nfs $DOTFILE_DIR/.zshrc $HOME/.zshrc
 source $HOME/.zshrc
 
 
@@ -94,7 +94,7 @@ fi
 if [ -f $HOME/.vimrc ]; then
   cp $HOME/.vimrc $HOME/.vimrc.backup
 fi
-ln -nfs $DOTFILE_DIR/vimrc $HOME/.vimrc
+ln -nfs $DOTFILE_DIR/.vimrc $HOME/.vimrc
 
 
 printmsg "All dotfiles setup completed!\nPlease logout/login to apply some system configurations."
