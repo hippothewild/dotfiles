@@ -17,3 +17,5 @@
   lola = log --graph --decorate --pretty=format:'%C(yellow)%h %C(green)(%ar) %C(cyan)%an %C(bold white)|%C(reset) %C(white)%s%C(reset)%C(auto)%d%C(reset)' --abbrev-commit --all
   hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
 
+[url "git@git.projectbro.com:"]
+	insteadOf = https://git.projectbro.com/
