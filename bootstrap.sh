@@ -41,7 +41,10 @@ pip3 install virtualenvwrapper
 printmsg "*** Change default shell to zsh, install oh-my-zsh and set configuration ***"
 echo "$(which zsh)"| sudo tee -a /etc/shells
 chsh -s $(which zsh)
-sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" -s --batch
+if [ -f $HOME/.zshrc ]; then
+  cp $HOME/.zshrc $HOME/.zshrc.backup
+fi
 ln -nfs $DOTFILE_DIR/zshrc $HOME/.zshrc
 source $HOME/.zshrc
 
@@ -54,14 +57,17 @@ if test $(which code); then
   code --install-extension PeterJausovec.vscode-docker
 
   if [ -f $HOME/Library/Application\ Support/Code/User/settings.json ]; then
-    cp $HOME/Library/Application\ Support/Code/User/settings.json $HOME/Library/Application\ Support/Code/User/settings.backup.json
+    cp $HOME/Library/Application\ Support/Code/User/settings.json $HOME/Library/Application\ Support/Code/User/settings.json.backup
   fi
-  cp ./vscode_settings.json $HOME/Library/Application\ Support/Code/User/settings.json
+  ln -nfs $DOTFILE_DIR/vscode_settings.json $HOME/Library/Application\ Support/Code/User/settings.json
 fi
 
 printmsg "*** Copy editor & terminal configurations ***"
-if [ -f $HOME/Library/Application\ Support/iTerm2/DynamicProfiles ]; then
-  cp $DOTFILE_DIR/iterm2_settings.json $HOME/Library/Application\ Support/iTerm2/DynamicProfiles
+if [ -d $HOME/Library/Application\ Support/iTerm2/DynamicProfiles ]; then
+  ln -nfs $DOTFILE_DIR/iterm2_profile.plist $HOME/Library/Application\ Support/iTerm2/DynamicProfiles/iterm2_profile.plist
+fi
+if [ -f $HOME/.vimrc ]; then
+  cp $HOME/.vimrc $HOME/.vimrc.backup
 fi
 ln -nfs $DOTFILE_DIR/vimrc $HOME/.vimrc
 
