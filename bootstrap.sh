@@ -79,6 +79,7 @@ if test $(which code); then
   code --install-extension ms-vscode.Go
   code --install-extension octref.vetur
   code --install-extension PeterJausovec.vscode-docker
+  code --install-extension esbenp.prettier-vscode
 
   if [ -f $HOME/Library/Application\ Support/Code/User/settings.json ]; then
     cp $HOME/Library/Application\ Support/Code/User/settings.json $HOME/Library/Application\ Support/Code/User/settings.json.backup

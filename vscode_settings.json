@@ -1,9 +1,6 @@
 {
   "window.zoomLevel": 0,
   "files.eol": "\n",
-  "editor.formatOnSave": true,
-  "editor.formatOnType": false,
-  "editor.formatOnPaste": false,
   "editor.fontSize": 14,
   "editor.tabSize": 2,
   "editor.codeLens": false,
@@ -24,5 +21,9 @@
     "delay": 500
   },
   "go.gopath": "/Users/jihwan/dev/go",
-  "go.lintOnSave": "off"
+  "go.lintOnSave": "off",
+  "[go]": {
+    "editor.insertSpaces": false,
+    "editor.formatOnSave": true
+  }
 }

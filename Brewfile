@@ -19,7 +19,7 @@ brew "tmux"
 brew "wget"
 brew "zsh"
 
-# Applications installed by homebrew/case
+# Applications installed by homebrew/cask
 cask "appcleaner"
 cask "docker"
 cask "font-hack"
@@ -31,6 +31,7 @@ cask "iterm2"
 cask "notion"
 cask "slack"
 cask "visual-studio-code"
+cask "vlc"
 
 # Applications installed from Mac App Store https://github.com/mas-cli/mas
 mas "Airmail 3", id: 918858936
