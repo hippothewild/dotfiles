@@ -1,29 +1,46 @@
 {
-  "window.zoomLevel": 0,
-  "files.eol": "\n",
   "editor.fontSize": 14,
   "editor.tabSize": 2,
   "editor.codeLens": false,
-  "tslint.enable": true,
-  "tslint.run": "onSave",
-  "tslint.autoFixOnSave": true,
-  "tslint.alwaysShowRuleFailuresAsWarnings": true,
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "go.gopath": "/Users/jihwan/dev/go",
+  "go.lintOnSave": "off",
+  "latex-workshop.view.pdf.viewer": "tab",
+  "latex-workshop.latex.clean.enabled": true,
   "prettier.singleQuote": true,
   "prettier.trailingComma": "all",
-  "terraform.format": {
-    "enable": true,
-    "formatOnSave": true
-  },
   "terraform.indexing": {
     "enabled": true,
     "indexerPath": "terraform-index",
     "liveIndexing": false,
     "delay": 500
   },
-  "go.gopath": "/Users/jihwan/dev/go",
-  "go.lintOnSave": "off",
+  "tslint.enable": true,
+  "tslint.run": "onSave",
+  "tslint.autoFixOnSave": true,
+  "tslint.alwaysShowRuleFailuresAsWarnings": true,
+  "window.zoomLevel": 1,
+  "workbench.settings.editor": "json",
   "[go]": {
     "editor.insertSpaces": false,
     "editor.formatOnSave": true
-  }
+  },
+  "[markdown]": {
+    "editor.acceptSuggestionOnEnter": "off",
+    "editor.formatOnSave": false,
+    "editor.renderWhitespace": "all",
+    "editor.tabSize": 2,
+    "editor.wordWrap": "on",
+    "files.trimTrailingWhitespace": false,
+  },
+  "[python]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4
+  },
+  "[terraform]": {
+    "editor.formatOnSave": true
+  },
+  "git.ignoreMissingGitWarning": true
 }

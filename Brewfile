@@ -28,6 +28,7 @@ cask "goland"
 cask "google-chrome"
 cask "intellij-idea"
 cask "iterm2"
+cask "java"
 cask "notion"
 cask "slack"
 cask "visual-studio-code"
@@ -35,7 +36,6 @@ cask "vlc"
 
 # Applications installed from Mac App Store https://github.com/mas-cli/mas
 mas "Airmail 3", id: 918858936
-mas "Bear", id: 1091189122
 mas "Between", id: 1320741520
 mas "Day One", id: 1055511498
 mas "KakaoTalk", id: 869223134

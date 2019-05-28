@@ -2,15 +2,15 @@
   ui = true
 
 [user]
-  name = Jihwan Chun
-	email = jihwan0321@gmail.com
+	name = Jihwan Chun
+	email = jihwan.chun@pubg.com
 
 [diff]
   indentHeuristic = true
 
-[url "git@github.com:"]
-  insteadOf = "git://github.com/"
-  insteadOf = "https://github.com/"
+#[url "git@github.com:"]
+#  insteadOf = "git://github.com/"
+#  insteadOf = "https://github.com/"
 
 [alias]
   lol = log --graph --decorate --pretty=format:'%C(yellow)%h %C(green)(%ar) %C(cyan)%an %C(bold white)|%C(reset) %C(white)%s%C(reset)%C(auto)%d%C(reset)' --abbrev-commit

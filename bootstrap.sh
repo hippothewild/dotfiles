@@ -37,7 +37,15 @@ defaults write com.apple.dock dashboard-in-overlay -bool true
 # Hot corner; Bottom left screen corner -> Start screen saver
 defaults write com.apple.dock wvous-bl-corner -int 5
 defaults write com.apple.dock wvous-bl-modifier -int 0
-
+# For macOS with Korean input, use backquote(`) instead of Korean Won(₩)
+if [ ! -f ~/Library/KeyBindings/DefaultkeyBinding.dict ]; then
+	mkdir -p ~/Library/KeyBindings
+  cat << EOF > ~/Library/KeyBindings/DefaultkeyBinding.dict
+{
+  "₩" = ("insertText:", "\`");
+}
+EOF
+fi
 
 printmsg "*** Install HomeBrew ***"
 if test ! $(which brew); then
