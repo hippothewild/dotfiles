@@ -19,12 +19,17 @@ export LC_CTYPE="en_US.UTF-8"
 source $ZSH/oh-my-zsh.sh
 
 # custom prompt theme for oh-my-zsh
+function conditional_git_prompt() {
+  if git rev-parse --git-dir > /dev/null 2>&1 ; then
+    echo " $(git_prompt_info)"
+  fi
+}
 PROMPT='%{$fg[yellow]%}$(shrink_path -l -t)%(?,,%{${fg_bold[white]}%} [%?]) %{$reset_color%}'
-RPROMPT='$(kube_ps1) $(git_prompt_info)'
+RPROMPT='$(kube_ps1)$(conditional_git_prompt)'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[blue]%}("
-ZSH_THEME_GIT_PROMPT_SUFFIX=")%{$reset_color%} "
-ZSH_THEME_GIT_PROMPT_DIRTY="⚡"
+ZSH_THEME_GIT_PROMPT_SUFFIX=")%{$reset_color%}"
+ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[red]%}*%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_CLEAN=""
 
 # Path related to Golang
