@@ -19,7 +19,7 @@ export LC_CTYPE="en_US.UTF-8"
 source $ZSH/oh-my-zsh.sh
 
 # custom prompt theme for oh-my-zsh
-PROMPT='%{$fg[yellow]%}$(shrink_path -l -t)%(?,,%{${fg_bold[white]}%} [%?])%{$reset_color%}'
+PROMPT='%{$fg[yellow]%}$(shrink_path -l -t)%(?,,%{${fg_bold[white]}%} [%?]) %{$reset_color%}'
 RPROMPT='$(kube_ps1) $(git_prompt_info)'
 
 ZSH_THEME_GIT_PROMPT_PREFIX="%{$fg[blue]%}("
