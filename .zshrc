@@ -33,6 +33,7 @@ ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[red]%}*%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_CLEAN=""
 
 # Path related to Golang
+export GO111MODULE=on
 export GOPATH=$HOME/dev/go
 export GOROOT=/usr/local/opt/go/libexec
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
@@ -54,10 +55,14 @@ source /usr/local/bin/virtualenvwrapper_lazy.sh
 # Aliases
 alias resetdns='sudo networksetup -setdnsservers Ethernet 1.1.1.1 8.8.8.8'
 alias pip='pip3'
-alias kubetoken='kubectl -n kube-system get secret -o json | jq ".items[] | select(.metadata.name | contains(\"kubernetes-dashboard-token\"))" | jq -r ".data.token" | base64 --decode | pbcopy'
 alias kp='kubetoken && kubectl proxy'
-alias mtuon='sudo ifconfig en0 mtu 400 && networksetup -getMTU en0'
+alias mtuon='sudo ifconfig en0 mtu 500 && networksetup -getMTU en0'
 alias mtuoff='sudo ifconfig en0 mtu 1500 && networksetup -getMTU en0'
+
+# Aliases (Kubernetes)
+alias kubetoken='kubectl -n kube-system get secret -o json | jq ".items[] | select(.metadata.name | contains(\"kubernetes-dashboard-token\"))" | jq -r ".data.token" | base64 --decode | pbcopy'
+alias k='kubectl'
+alias kns='kubens'
 
 # Kops
 export NAME=k8s.datatech.pubgda.com
