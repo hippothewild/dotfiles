@@ -8,7 +8,6 @@ tap "homebrew/core"
 brew "ack"
 brew "awscli"
 brew "go"
-brew "dep"
 brew "docker"
 brew "mas"
 brew "node"
@@ -18,6 +17,7 @@ brew "terraform"
 brew "tmux"
 brew "wget"
 brew "zsh"
+brew "dockutil"
 
 # Applications installed by homebrew/cask
 cask "appcleaner"
@@ -26,9 +26,7 @@ cask "font-hack"
 cask "font-source-code-pro"
 cask "goland"
 cask "google-chrome"
-cask "intellij-idea"
 cask "iterm2"
-cask "java"
 cask "notion"
 cask "slack"
 cask "visual-studio-code"
@@ -43,4 +41,3 @@ mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Pocket", id: 568494494
-mas "Reeder", id: 880001334

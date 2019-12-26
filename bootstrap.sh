@@ -20,54 +20,31 @@ fi
 
 DOTFILE_DIR=$(pwd)
 
-printmsg "*** Set macOS system configurations ***"
-# Enable 3-finger drag
-defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeFingerDrag -bool true
-defaults write com.apple.AppleMultitouchTrackpad TrackpkadThreeFingerDrag -bool true
-# Minimize keyboard input repeat delay and repeat period
-defaults write -g InitialKeyRepeat -int 15
-defaults write -g KeyRepeat -int 2
-# Tab touchpad to click
-defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
-defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-# Disable Dashboard
-defaults write com.apple.dashboard mcx-disabled -bool true
-# Don’t show Dashboard as a Space
-defaults write com.apple.dock dashboard-in-overlay -bool true
-# Hot corner; Bottom left screen corner -> Start screen saver
-defaults write com.apple.dock wvous-bl-corner -int 5
-defaults write com.apple.dock wvous-bl-modifier -int 0
-# For macOS with Korean input, use backquote(`) instead of Korean Won(₩)
-if [ ! -f ~/Library/KeyBindings/DefaultkeyBinding.dict ]; then
-	mkdir -p ~/Library/KeyBindings
-  cat << EOF > ~/Library/KeyBindings/DefaultkeyBinding.dict
-{
-  "₩" = ("insertText:", "\`");
-}
-EOF
-fi
+# Ask for the administrator password upfront
+sudo -v
+
+# Keep-alive: update existing `sudo` time stamp until `.macos` has finished
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 printmsg "*** Install HomeBrew ***"
 if test ! $(which brew); then
   ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 fi
 
-
 printmsg "*** Install binaries and applications via Homebrew ***"
 brew update
 brew tap homebrew/bundle
 brew bundle --file=$DOTFILE_DIR/Brewfile
 brew cleanup
-brew cask cleanup
 
+printmsg "*** Set macOS system configurations ***"
+sh bootstrap-macos.sh
 
 printmsg "*** Set git configurations ***"
 [ ! -f $HOME/.gitconfig ] && ln -nfs $DOTFILE_DIR/.gitconfig $HOME/.gitconfig
 
-
 printmsg "*** Install virtualenvwrapper via pip3 ***"
 pip3 install virtualenvwrapper
-
 
 printmsg "*** Change default shell to zsh, install oh-my-zsh and set configuration ***"
 echo "$(which zsh)"| sudo tee -a /etc/shells
