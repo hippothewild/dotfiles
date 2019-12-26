@@ -11,8 +11,8 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadThreeF
 defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -int 1
 
 # Minimize keyboard input repeat delay and repeat period
-defaults write -g InitialKeyRepeat -int 10
-defaults write -g KeyRepeat -int 1.5
+defaults write -g InitialKeyRepeat -int 15
+defaults write -g KeyRepeat -int 2
 
 # Tab touchpad to click
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
