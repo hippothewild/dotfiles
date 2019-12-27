@@ -8,7 +8,7 @@ DISABLE_AUTO_TITLE="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git alias-tips virtualenvwrapper wd shrink-path kube-ps1)
+plugins=(git virtualenvwrapper wd shrink-path kube-ps1)
 
 # User configuration about locale
 export LANG="en_US.UTF-8"
