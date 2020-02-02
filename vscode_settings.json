@@ -9,6 +9,8 @@
   "go.lintOnSave": "off",
   "latex-workshop.view.pdf.viewer": "tab",
   "latex-workshop.latex.autoClean.run": "onBuilt",
+  "latex-workshop.latex.autoBuild.run": "onFileChange",
+  "latex-workshop.latex.autoBuild.interval": 5000,
   "prettier.singleQuote": true,
   "prettier.trailingComma": "all",
   "terraform.indexing": {
@@ -43,5 +45,4 @@
     "editor.formatOnSave": true
   },
   "git.ignoreMissingGitWarning": true,
-  "javascript.updateImportsOnFileMove.enabled": "always"
 }

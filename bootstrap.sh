@@ -65,6 +65,7 @@ if test $(which code); then
   code --install-extension octref.vetur
   code --install-extension PeterJausovec.vscode-docker
   code --install-extension esbenp.prettier-vscode
+  code --install-extension James-Yu.latex-workshop
 
   if [ -f $HOME/Library/Application\ Support/Code/User/settings.json ]; then
     cp $HOME/Library/Application\ Support/Code/User/settings.json $HOME/Library/Application\ Support/Code/User/settings.json.backup
