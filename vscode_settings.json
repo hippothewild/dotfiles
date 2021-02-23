@@ -13,17 +13,12 @@
   "latex-workshop.latex.autoBuild.interval": 5000,
   "prettier.singleQuote": true,
   "prettier.trailingComma": "all",
-  "terraform.indexing": {
-    "enabled": true,
-    "indexerPath": "terraform-index",
-    "liveIndexing": false,
-    "delay": 500
-  },
+  "python.poetryPath": "/Users/jihwan/.poetry/bin/poetry",
+  "python.venvPath": "~/Library/Caches/pypoetry/virtualenvs",
   "tslint.enable": true,
   "tslint.run": "onSave",
   "tslint.autoFixOnSave": true,
   "tslint.alwaysShowRuleFailuresAsWarnings": true,
-  "window.zoomLevel": 1,
   "workbench.settings.editor": "json",
   "[go]": {
     "editor.insertSpaces": false,
@@ -41,8 +36,14 @@
     "editor.insertSpaces": true,
     "editor.tabSize": 4
   },
-  "[terraform]": {
-    "editor.formatOnSave": true
+  "terraform.languageServer": {
+    "external": true,
+    "args": [
+      "serve"
+    ]
   },
-  "git.ignoreMissingGitWarning": true,
+"git.ignoreMissingGitWarning": true,
+"jupyter.askForKernelRestart": false,
+"extensions.ignoreRecommendations": false,
+"window.zoomLevel": 1,
 }

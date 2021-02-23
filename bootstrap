@@ -59,13 +59,12 @@ source $HOME/.zshrc
 
 printmsg "*** Install Visual Studio Code extensions ***"
 if test $(which code); then
-  code --install-extension eg2.tslint
-  code --install-extension mauve.terraform
-  code --install-extension ms-vscode.Go
-  code --install-extension octref.vetur
-  code --install-extension PeterJausovec.vscode-docker
-  code --install-extension esbenp.prettier-vscode
-  code --install-extension James-Yu.latex-workshop
+  code --install-extension \
+    eg2.tslint \
+    golang.go \
+    hashicorp.terraform \
+    James-Yu.latex-workshop \
+    ms-python.python
 
   if [ -f $HOME/Library/Application\ Support/Code/User/settings.json ]; then
     cp $HOME/Library/Application\ Support/Code/User/settings.json $HOME/Library/Application\ Support/Code/User/settings.json.backup
