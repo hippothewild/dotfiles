@@ -25,6 +25,7 @@ brew "mas"
 brew "minikube"
 brew "mtr"
 brew "node"
+brew "openblas"
 brew "poetry"
 brew "pre-commit"
 brew "pyenv"
@@ -62,3 +63,4 @@ mas "MKPlayer", id: 1335612105
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "Pocket", id: 568494494
+mas "Flow", id: 1423210932

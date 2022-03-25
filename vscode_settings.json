@@ -11,10 +11,6 @@
   "latex-workshop.latex.autoClean.run": "onBuilt",
   "latex-workshop.latex.autoBuild.run": "onFileChange",
   "latex-workshop.latex.autoBuild.interval": 5000,
-  "prettier.singleQuote": true,
-  "prettier.trailingComma": "all",
-  "python.poetryPath": "/Users/jihwan/.poetry/bin/poetry",
-  "python.venvPath": "~/Library/Caches/pypoetry/virtualenvs",
   "tslint.enable": true,
   "tslint.run": "onSave",
   "tslint.autoFixOnSave": true,
@@ -34,7 +30,30 @@
   },
   "[python]": {
     "editor.insertSpaces": true,
-    "editor.tabSize": 4
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+  },
+  "python.analysis.typeCheckingMode": "basic",
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+  },
+  "eslint.workingDirectories": [{"mode": "auto"}],
+  "eslint.validate": ["typescript", "typescriptreact"],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
   },
   "terraform.languageServer": {
     "external": true,
@@ -42,8 +61,19 @@
       "serve"
     ]
   },
-"git.ignoreMissingGitWarning": true,
-"jupyter.askForKernelRestart": false,
-"extensions.ignoreRecommendations": false,
-"window.zoomLevel": 1,
+  "git.ignoreMissingGitWarning": true,
+  "jupyter.askForKernelRestart": false,
+  "extensions.ignoreRecommendations": false,
+  "workbench.editorAssociations": {
+    "*.ipynb": "jupyter-notebook"
+  },
+  "go.toolsManagement.autoUpdate": true,
+  "notebook.cellToolbarLocation": {
+    "default": "right",
+    "jupyter-notebook": "left"
+  },
+  "editor.inlineSuggest.enabled": true,
+  "git.autofetch": true,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "window.zoomLevel": 1,
 }

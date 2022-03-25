@@ -32,31 +32,66 @@ ZSH_THEME_GIT_PROMPT_SUFFIX=")%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[red]%}*%{$reset_color%}"
 ZSH_THEME_GIT_PROMPT_CLEAN=""
 
-# Path related to Golang
-export GO111MODULE=on
+# Homebrew
+export HOMEBREW_PREFIX="/opt/homebrew";
+export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
+export HOMEBREW_REPOSITORY="/opt/homebrew";
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}";
+export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:";
+export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
+
+# Homebrew for Rosetta 2
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+alias ibrew='arch -x86_64 /usr/local/bin/brew'
+
+# Golang
 export GOPATH=$HOME/dev/go
-export GOROOT=/usr/local/opt/go/libexec
+export GOROOT="$(brew --prefix golang)/libexec"
 export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 
-# Python and Poetry
+# Pyenv
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
-if command -v pyenv 1>/dev/null 2>&1; then
+if which pyenv > /dev/null; then
+  eval "$(pyenv init --path)"
   eval "$(pyenv init -)"
 fi
-export PATH="$HOME/.poetry/bin:$PATH"
+if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 
-# Aliases
-alias resetdns='sudo networksetup -setdnsservers Ethernet 1.1.1.1 8.8.8.8'
-alias python='python3'
-alias pip='pip3'
-alias ls='exa'
+# Pyenv (rosetta)
+alias ipyenv="arch -x86_64 pyenv"
 
-# Aliases (Kubernetes)
-export KUBECONFIG="/Users/jihwan/.kube/config"
+# Node
+export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
+
+# Kubernetes
+export KUBECONFIG=/Users/jihwan/.kube/config:/Users/jihwan/.kube/config_gangnam:/Users/jihwan/.kube/config_kaist
 alias kubetoken='kubectl -n kube-utils get secret -o json | jq ".items[] | select(.metadata.name | contains(\"kubernetes-dashboard-token\"))" | jq -r ".data.token" | base64 --decode | pbcopy'
 alias k='kubectl'
 alias kns='kubens'
+
+# Misc aliases
+alias resetdns='sudo networksetup -setdnsservers en0 1.1.1.1 8.8.8.8'
+alias python='python3'
+alias pip='pip3'
+alias ls='exa'
+alias vpdev='kubens aron-backend-dev && kubectl get po -l app=aron-backend -o json | jq ".items[0].metadata.name" | xargs -I{} kubectl port-forward {} 10000:10000'
+alias vpprod='kubens aron-backend-prod && kubectl get po -l app=aron-backend -o json | jq ".items[0].metadata.name" | xargs -I{} kubectl port-forward {} 10000:10000'
+
+# linear.app
+lnls() {
+  curl -s \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -H "Authorization: $LINEAR_API_KEY" \
+  --data '{ "query": "{ viewer { assignedIssues { nodes { identifier title state { name type } cycle { number } } } } }" }' \
+  https://api.linear.app/graphql \
+  | jq -r '.data.viewer.assignedIssues.nodes | map(select(.state.type!="completed" and .state.type!="canceled")) | sort_by(.state.name) | .[] | [.identifier, .state.name, "Cycle " + (.cycle.number | tostring), .title] | join(" | ")'
+}
+
+# Google Cloud SDK
+if [ -f '/Users/jihwan/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/jihwan/Downloads/google-cloud-sdk/path.zsh.inc'; fi
+if [ -f '/Users/jihwan/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/jihwan/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
 
 # Autocompletion
 fpath+=~/.zfunc

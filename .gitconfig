@@ -19,3 +19,5 @@
 
 [url "git@git.projectbro.com:"]
 	insteadOf = https://git.projectbro.com/
+[pull]
+	rebase = false

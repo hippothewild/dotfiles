@@ -34,10 +34,6 @@ defaults write com.apple.dashboard mcx-disabled -bool true
 # Don’t show Dashboard as a Space
 defaults write com.apple.dock dashboard-in-overlay -bool true
 
-# Hot corner; Bottom left screen corner -> Start screen saver
-defaults write com.apple.dock wvous-bl-corner -int 5
-defaults write com.apple.dock wvous-bl-modifier -int 0
-
 # For macOS with Korean input, use backquote(`) instead of Korean Won(₩)
 if [ ! -f ~/Library/KeyBindings/DefaultkeyBinding.dict ]; then
 	mkdir -p ~/Library/KeyBindings
@@ -47,6 +43,17 @@ if [ ! -f ~/Library/KeyBindings/DefaultkeyBinding.dict ]; then
 }
 EOF
 fi
+
+# Start screen saver after 1 minute idle time
+defaults -currentHost write com.apple.screensaver idleTime -int 60
+
+# Requires password immediately after screen saver starts
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 0
+
+# Hot corner; Bottom left screen corner -> Start screen saver
+defaults write com.apple.dock wvous-bl-corner -int 5
+defaults write com.apple.dock wvous-bl-modifier -int 0
 
 # ------
 # Finder
