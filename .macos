@@ -89,7 +89,7 @@ defaults write com.apple.dock show-recents -bool false
 
 # Arrange applications on Dock
 dockutil --no-restart --remove all
-dockutil --no-restart --add "/System/Applications/Calendar.app"
+dockutil --no-restart --add "/Applications/Cron.app"
 dockutil --no-restart --add "/Applications/Google Chrome.app"
 dockutil --no-restart --add "/Applications/iTerm.app"
 dockutil --no-restart --add "/Applications/Visual Studio Code.app"
