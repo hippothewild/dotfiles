@@ -22,11 +22,11 @@ defaults write com.apple.menuextra.clock DateFormat -string "EEE d MMM HH:mm"
 defaults write com.apple.AppleMultitouchTrackpad Clicking -bool true
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
 
-# Show battery status in menu
-defaults write com.apple.menuextra.battery ShowPercent -string "YES"
+# Show battery percentage in menu bar
+defaults write com.apple.controlcenter.plist BatteryShowPercentage -bool true
 
 # Show Bluetooth in menu bar
-defaults write com.apple.systemuiserver menuExtras -array-add "/System/Library/CoreServices/Menu Extras/Bluetooth.menu"
+defaults write com.apple.controlcenter.plist Bluetooth -int 18
 
 # Disable Dashboard
 defaults write com.apple.dashboard mcx-disabled -bool true
