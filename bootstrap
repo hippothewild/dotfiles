@@ -29,8 +29,11 @@ fi
 DOTFILE_DIR=$(pwd)
 
 printmsg "*** Install HomeBrew ***"
-if test ! "$(which brew)"; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+if [[ $(command -v brew) == "" ]]; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+else
+    echo "Homebrew is already installed, updating..."
+    brew update
 fi
 
 printmsg "*** Enable Rosetta 2 (for Apple Silicon) ***"
