@@ -18,22 +18,22 @@ if test ! "$(which tar)"; then
   exit 1
 fi
 if test ! "$(which curl)"; then
-    echo 'Install curl to continue.'
-    exit 1
+  echo 'Install curl to continue.'
+  exit 1
 fi
 if test ! "$(which git)"; then
-    echo 'Install git to continue.'
-    exit 1
+  echo 'Install git to continue.'
+  exit 1
 fi
 
 DOTFILE_DIR=$(pwd)
 
 printmsg "*** Install HomeBrew ***"
-if [[ $(command -v brew) == "" ]]; then
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+if [[ $(command -v /opt/homebrew/bin/brew) == "" ]]; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 else
-    echo "Homebrew is already installed, updating..."
-    brew update
+  echo "Homebrew is already installed, updating..."
+  /opt/homebrew/bin/brew update
 fi
 
 printmsg "*** Enable Rosetta 2 (for Apple Silicon) ***"
