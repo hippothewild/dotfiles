@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 printmsg() {
   echo -e "\033[1;34m$1\033[0m"
 }
@@ -41,6 +43,9 @@ brew tap homebrew/bundle
 brew bundle --file="$DOTFILE_DIR"/Brewfile
 brew cleanup
 
+printmsg "*** Link /usr/bin/python to /usr/bin/python3 for backward compatibility ***"
+ln -nfs /usr/bin/python "$(which python3)"
+
 printmsg "*** Set macOS system configurations ***"
 sh .macos
 
@@ -48,9 +53,6 @@ printmsg "*** Set git configurations ***"
 [ ! -f "$HOME"/.gitconfig ] && ln -nfs "$DOTFILE_DIR"/.gitconfig "$HOME"/.gitconfig
 [ ! -f "$HOME"/.gitconfig-vessl ] && ln -nfs "$DOTFILE_DIR"/.gitconfig-vessl "$HOME"/.gitconfig-vessl
 
-printmsg "*** Install virtualenvwrapper via pip3 ***"
-pip3 install --user --upgrade pip
-pip3 install --user virtualenvwrapper
 
 printmsg "*** Change default shell to zsh, install oh-my-zsh and set configuration ***"
 which zsh | sudo tee -a /etc/shells
