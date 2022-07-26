@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.
-export ZSH=/Users/jihwan/.oh-my-zsh
+export ZSH=/Users/$USERNAME/.oh-my-zsh
 
 # Disable auto-setting terminal title.
 DISABLE_AUTO_TITLE="true"
@@ -58,7 +58,7 @@ if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -
 export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
 
 # Kubernetes
-export KUBECONFIG=$(for i in $(find /Users/jihwan/.kube/kubeconfigs -iname '*.kubeconfig') ; do echo -n ":$i"; done | cut -c 2-)
+export KUBECONFIG=$(for i in $(find /Users/$USERNAME/.kube/kubeconfigs -iname '*.kubeconfig') ; do echo -n ":$i"; done | cut -c 2-)
 alias kubetoken='kubectl -n kube-utils get secret -o json | jq ".items[] | select(.metadata.name | contains(\"kubernetes-dashboard-token\"))" | jq -r ".data.token" | base64 --decode | pbcopy'
 alias k='kubectl'
 alias kns='kubens'
@@ -70,8 +70,8 @@ alias pip='pip3'
 alias ls='exa'
 
 # Google Cloud SDK
-if [ -f '/Users/jihwan/Downloads/google-cloud-sdk/path.zsh.inc' ]; then . '/Users/jihwan/Downloads/google-cloud-sdk/path.zsh.inc'; fi
-if [ -f '/Users/jihwan/Downloads/google-cloud-sdk/completion.zsh.inc' ]; then . '/Users/jihwan/Downloads/google-cloud-sdk/completion.zsh.inc'; fi
+if [ -f "/Users/$USERNAME/Downloads/google-cloud-sdk/path.zsh.inc" ]; then . "/Users/$USERNAME/Downloads/google-cloud-sdk/path.zsh.inc"; fi
+if [ -f "/Users/$USERNAME/Downloads/google-cloud-sdk/completion.zsh.inc" ]; then . "/Users/$USERNAME/Downloads/google-cloud-sdk/completion.zsh.inc"; fi
 
 # Autocompletion
 fpath+=~/.zfunc
