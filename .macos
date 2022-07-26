@@ -90,17 +90,17 @@ defaults write com.apple.dock show-recents -bool false
 # Arrange applications on Dock
 dockutil --no-restart --remove all
 dockutil --no-restart --add "/Applications/Cron.app"
+dockutil --no-restart --add "/Applications/Visual Studio Code.app"
 dockutil --no-restart --add "/Applications/Google Chrome.app"
 dockutil --no-restart --add "/Applications/iTerm.app"
-dockutil --no-restart --add "/Applications/Visual Studio Code.app"
 dockutil --no-restart --add "/Applications/Notion.app"
-dockutil --no-restart --add "/Applications/Chat.app"
 dockutil --no-restart --add "/System/Applications/Notes.app"
-dockutil --no-restart --add "/Applications/Pocket.app"
 dockutil --no-restart --add "/Applications/Slack.app"
+dockutil --no-restart --add "/Applications/Linear.app"
 dockutil --no-restart --add "/Applications/Between.app"
+dockutil --no-restart --add "/Applications/KakaoTalk.app"
 dockutil --no-restart --add "/Applications/feedly.app"
-dockutil --no-restart --add "/Applications/Beekeeper Studio.app"
+dockutil --no-restart --add "/Applications/Spotify.app"
 
 # Kill affected apps
 for app in "Dock" "Finder"; do
