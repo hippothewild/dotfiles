@@ -6,7 +6,7 @@
   "tslint.alwaysShowRuleFailuresAsWarnings" : true,
   "shellcheck.run": "onSave",
   "editor.codeLens" : false,
-  "editor.fontSize" : 14,
+  "editor.fontSize" : 15,
   "python.analysis.typeCheckingMode" : "basic",
   "go.lintOnSave" : "off",
   "workbench.editorAssociations" : {

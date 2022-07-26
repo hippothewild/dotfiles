@@ -16,7 +16,7 @@ export LC_ALL="en_US.UTF-8"
 export LC_CTYPE="en_US.UTF-8"
 
 # oh-my-zsh
-source $ZSH/oh-my-zsh.sh
+source /Users/$USERNAME/.oh-my-zsh/oh-my-zsh.sh
 
 # custom prompt theme for oh-my-zsh
 function conditional_git_prompt() {

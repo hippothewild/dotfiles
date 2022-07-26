@@ -32,7 +32,7 @@ printmsg "*** Install HomeBrew ***"
 if [[ $(command -v /opt/homebrew/bin/brew) == "" ]]; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 else
-  echo "Homebrew is already installed, updating..."
+  printmsg "Homebrew is already installed, updating..."
   /opt/homebrew/bin/brew update
 fi
 
@@ -61,22 +61,33 @@ printmsg "*** Set git configurations ***"
 printmsg "*** Change default shell to zsh, install oh-my-zsh and set configuration ***"
 which zsh | sudo tee -a /etc/shells
 chsh -s "$(which zsh)"
-RUNZSH=no sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" -s --batch
+if [ -d ~/.oh-my-zsh ]; then
+  printmsg "oh-my-zsh has already installed"
+else
+  sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
 if [ -f "$HOME"/.zshrc ]; then
   cp "$HOME"/.zshrc "$HOME"/.zshrc.backup
 fi
 ln -nfs "$DOTFILE_DIR"/.zshrc "$HOME"/.zshrc
-source "$HOME"/.zshrc
-
 
 printmsg "*** Install Visual Studio Code extensions ***"
 if test "$(which code)"; then
-  code --install-extension eg2.tslint
-  code --install-extension golang.go
-  code --install-extension hashicorp.terraform
-  code --install-extension James-Yu.latex-workshop
-  code --install-extension ms-python.python
-
+  for ext in arcanis.vscode-zipfs \
+      dbaeumer.vscode-eslint \
+      eamodio.gitlens \
+      esbenp.prettier-vscode \
+      GitHub.copilot \
+      GitHub.vscode-pull-request-github \
+      golang.go \
+      hashicorp.terraform \
+      James-Yu.latex-workshop \
+      ms-python.python \
+      ms-vscode-remote.remote-ssh \
+      ms-vscode-remote.remote-ssh-edit \
+      timonwong.shellcheck; do
+    code --install-extension $ext
+  done
   if [ -f "$HOME"/Library/Application\ Support/Code/User/settings.json ]; then
     cp "$HOME"/Library/Application\ Support/Code/User/settings.json "$HOME"/Library/Application\ Support/Code/User/settings.json.backup
   fi

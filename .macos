@@ -78,7 +78,7 @@ sudo defaults write /Library/Preferences/com.apple.dock autohide -bool YES
 defaults write com.apple.dock autohide -bool true
 
 # Set the icon size of Dock items
-defaults write com.apple.dock tilesize -int 64
+defaults write com.apple.dock tilesize -int 72
 
 # Remove the auto-hiding Dock delay
 defaults write com.apple.dock autohide-delay -float 0
