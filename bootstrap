@@ -11,15 +11,15 @@ sudo -v
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
 
 printmsg "*** Check prerequisite ***"
-if test ! $(which tar); then
+if test ! "$(which tar)"; then
   echo 'Install tar/gz to continue.'
   exit 1
 fi
-if test ! $(which curl); then
+if test ! "$(which curl)"; then
     echo 'Install curl to continue.'
     exit 1
 fi
-if test ! $(which git); then
+if test ! "$(which git)"; then
     echo 'Install git to continue.'
     exit 1
 fi
@@ -27,7 +27,7 @@ fi
 DOTFILE_DIR=$(pwd)
 
 printmsg "*** Install HomeBrew ***"
-if test ! $(which brew); then
+if test ! "$(which brew)"; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 fi
 
@@ -38,52 +38,53 @@ printmsg "*** Install binaries and applications via Homebrew ***"
 export PATH="$PATH:/opt/homebrew/bin"
 brew update
 brew tap homebrew/bundle
-brew bundle --file=$DOTFILE_DIR/Brewfile
+brew bundle --file="$DOTFILE_DIR"/Brewfile
 brew cleanup
 
 printmsg "*** Set macOS system configurations ***"
 sh .macos
 
 printmsg "*** Set git configurations ***"
-[ ! -f $HOME/.gitconfig ] && ln -nfs $DOTFILE_DIR/.gitconfig $HOME/.gitconfig
+[ ! -f "$HOME"/.gitconfig ] && ln -nfs "$DOTFILE_DIR"/.gitconfig "$HOME"/.gitconfig
+[ ! -f "$HOME"/.gitconfig-vessl ] && ln -nfs "$DOTFILE_DIR"/.gitconfig-vessl "$HOME"/.gitconfig-vessl
 
 printmsg "*** Install virtualenvwrapper via pip3 ***"
 pip3 install --user --upgrade pip
 pip3 install --user virtualenvwrapper
 
 printmsg "*** Change default shell to zsh, install oh-my-zsh and set configuration ***"
-echo "$(which zsh)"| sudo tee -a /etc/shells
-chsh -s $(which zsh)
+which zsh | sudo tee -a /etc/shells
+chsh -s "$(which zsh)"
 RUNZSH=no sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" -s --batch
-if [ -f $HOME/.zshrc ]; then
-  cp $HOME/.zshrc $HOME/.zshrc.backup
+if [ -f "$HOME"/.zshrc ]; then
+  cp "$HOME"/.zshrc "$HOME"/.zshrc.backup
 fi
-ln -nfs $DOTFILE_DIR/.zshrc $HOME/.zshrc
-source $HOME/.zshrc
+ln -nfs "$DOTFILE_DIR"/.zshrc "$HOME"/.zshrc
+source "$HOME"/.zshrc
 
 
 printmsg "*** Install Visual Studio Code extensions ***"
-if test $(which code); then
+if test "$(which code)"; then
   code --install-extension eg2.tslint
   code --install-extension golang.go
   code --install-extension hashicorp.terraform
   code --install-extension James-Yu.latex-workshop
   code --install-extension ms-python.python
 
-  if [ -f $HOME/Library/Application\ Support/Code/User/settings.json ]; then
-    cp $HOME/Library/Application\ Support/Code/User/settings.json $HOME/Library/Application\ Support/Code/User/settings.json.backup
+  if [ -f "$HOME"/Library/Application\ Support/Code/User/settings.json ]; then
+    cp "$HOME"/Library/Application\ Support/Code/User/settings.json "$HOME"/Library/Application\ Support/Code/User/settings.json.backup
   fi
-  ln -nfs $DOTFILE_DIR/vscode_settings.json $HOME/Library/Application\ Support/Code/User/settings.json
+  ln -nfs "$DOTFILE_DIR"/vscode_settings.json "$HOME"/Library/Application\ Support/Code/User/settings.json
 fi
 
 
 printmsg "*** Copy editor & terminal configurations ***"
 defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$DOTFILE_DIR/iterm"
 defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true
-if [ -f $HOME/.vimrc ]; then
-  cp $HOME/.vimrc $HOME/.vimrc.backup
+if [ -f "$HOME"/.vimrc ]; then
+  cp "$HOME"/.vimrc "$HOME"/.vimrc.backup
 fi
-ln -nfs $DOTFILE_DIR/.vimrc $HOME/.vimrc
+ln -nfs "$DOTFILE_DIR"/.vimrc "$HOME"/.vimrc
 
 
 printmsg "All dotfiles setup completed!\nPlease logout/login to apply some system configurations."

@@ -1,79 +1,96 @@
 {
-  "editor.fontSize": 14,
-  "editor.tabSize": 2,
-  "editor.codeLens": false,
-  "files.eol": "\n",
-  "files.insertFinalNewline": true,
-  "files.trimTrailingWhitespace": true,
-  "go.gopath": "/Users/jihwan/dev/go",
-  "go.lintOnSave": "off",
-  "latex-workshop.view.pdf.viewer": "tab",
-  "latex-workshop.latex.autoClean.run": "onBuilt",
-  "latex-workshop.latex.autoBuild.run": "onFileChange",
-  "latex-workshop.latex.autoBuild.interval": 5000,
-  "tslint.enable": true,
-  "tslint.run": "onSave",
-  "tslint.autoFixOnSave": true,
-  "tslint.alwaysShowRuleFailuresAsWarnings": true,
-  "workbench.settings.editor": "json",
-  "[go]": {
-    "editor.insertSpaces": false,
-    "editor.formatOnSave": true
+  "[javascript]" : {
+    "editor.defaultFormatter" : "esbenp.prettier-vscode",
+    "editor.formatOnSave" : true
   },
-  "[markdown]": {
-    "editor.acceptSuggestionOnEnter": "off",
-    "editor.formatOnSave": false,
-    "editor.renderWhitespace": "all",
-    "editor.tabSize": 2,
-    "editor.wordWrap": "on",
-    "files.trimTrailingWhitespace": false,
+  "tslint.alwaysShowRuleFailuresAsWarnings" : true,
+  "shellcheck.run": "onSave",
+  "editor.codeLens" : false,
+  "editor.fontSize" : 14,
+  "python.analysis.typeCheckingMode" : "basic",
+  "go.lintOnSave" : "off",
+  "workbench.editorAssociations" : {
+    "*.ipynb" : "jupyter-notebook"
   },
-  "[python]": {
-    "editor.insertSpaces": true,
-    "editor.tabSize": 4,
-    "editor.formatOnSave": true,
+  "tslint.run" : "onSave",
+  "files.eol" : "\n",
+  "latex-workshop.latex.autoClean.run" : "onBuilt",
+  "[go]" : {
+    "editor.insertSpaces" : false,
+    "editor.formatOnSave" : true
   },
-  "python.analysis.typeCheckingMode": "basic",
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true,
+  "go.toolsManagement.autoUpdate" : true,
+  "files.insertFinalNewline" : true,
+  "latex-workshop.latex.autoBuild.run" : "onFileChange",
+  "[python]" : {
+    "editor.insertSpaces" : true,
+    "editor.tabSize" : 4,
+    "editor.formatOnSave" : true
   },
-  "[javascriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true,
+  "typescript.updateImportsOnFileMove.enabled" : "always",
+  "[typescript]" : {
+    "editor.defaultFormatter" : "esbenp.prettier-vscode",
+    "editor.formatOnSave" : true
   },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true,
+  "github.copilot.enable" : {
+    "*": true,
+    "yaml": false,
+    "plaintext": false,
+    "markdown": false,
+    "ini": false,
+    "go": true
   },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true,
+  "[javascriptreact]" : {
+    "editor.defaultFormatter" : "esbenp.prettier-vscode",
+    "editor.formatOnSave" : true
   },
-  "eslint.workingDirectories": [{"mode": "auto"}],
-  "eslint.validate": ["typescript", "typescriptreact"],
-  "editor.codeActionsOnSave": {
-    "source.fixAll": true,
+  "eslint.workingDirectories" : [
+    {
+      "mode" : "auto"
+    }
+  ],
+  "notebook.cellToolbarLocation" : {
+    "default" : "right",
+    "jupyter-notebook" : "left"
   },
-  "terraform.languageServer": {
-    "external": true,
-    "args": [
+  "editor.inlineSuggest.enabled" : true,
+  "git.ignoreMissingGitWarning" : true,
+  "latex-workshop.view.pdf.viewer" : "tab",
+  "[typescriptreact]" : {
+    "editor.defaultFormatter" : "esbenp.prettier-vscode",
+    "editor.formatOnSave" : true
+  },
+  "editor.codeActionsOnSave" : {
+    "source.fixAll" : true
+  },
+  "git.autofetch" : true,
+  "editor.accessibilitySupport" : "off",
+  "latex-workshop.latex.autoBuild.interval" : 5000,
+  "tslint.enable" : true,
+  "editor.tabSize" : 2,
+  "tslint.autoFixOnSave" : true,
+  "go.gopath" : "\/Users\/jihwan\/dev\/go",
+  "jupyter.askForKernelRestart" : false,
+  "eslint.validate" : [
+    "typescript",
+    "typescriptreact"
+  ],
+  "extensions.ignoreRecommendations" : false,
+  "files.trimTrailingWhitespace" : true,
+  "terraform.languageServer" : {
+    "external" : true,
+    "args" : [
       "serve"
     ]
   },
-  "git.ignoreMissingGitWarning": true,
-  "jupyter.askForKernelRestart": false,
-  "extensions.ignoreRecommendations": false,
-  "workbench.editorAssociations": {
-    "*.ipynb": "jupyter-notebook"
+  "workbench.settings.editor" : "json",
+  "[markdown]" : {
+    "editor.tabSize" : 2,
+    "files.trimTrailingWhitespace" : false,
+    "editor.acceptSuggestionOnEnter" : "off",
+    "editor.renderWhitespace" : "all",
+    "editor.formatOnSave" : false,
+    "editor.wordWrap" : "on"
   },
-  "go.toolsManagement.autoUpdate": true,
-  "notebook.cellToolbarLocation": {
-    "default": "right",
-    "jupyter-notebook": "left"
-  },
-  "editor.inlineSuggest.enabled": true,
-  "git.autofetch": true,
-  "typescript.updateImportsOnFileMove.enabled": "always",
-  "window.zoomLevel": 1,
+  "go.lintTool": "golangci-lint"
 }
