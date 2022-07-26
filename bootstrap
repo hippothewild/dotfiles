@@ -36,9 +36,6 @@ else
   /opt/homebrew/bin/brew update
 fi
 
-printmsg "*** Enable Rosetta 2 (for Apple Silicon) ***"
-sudo softwareupdate --install-rosetta --agree-to-license
-
 printmsg "*** Install binaries and applications via Homebrew ***"
 export PATH="$PATH:/opt/homebrew/bin"
 brew update
