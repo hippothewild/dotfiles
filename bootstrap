@@ -43,8 +43,10 @@ brew tap homebrew/bundle
 brew bundle --file="$DOTFILE_DIR"/Brewfile
 brew cleanup
 
-printmsg "*** Link /usr/bin/python to /usr/bin/python3 for backward compatibility ***"
-ln -nfs /usr/bin/python "$(which python3)"
+if [ ! -f /usr/bin/python ] && [ -f /usr/bin/python3 ]; then
+  printmsg "*** Link /usr/bin/python to /usr/bin/python3 for backward compatibility ***"
+  ln -nfs /usr/bin/python3 /usr/bin/python
+fi
 
 printmsg "*** Set macOS system configurations ***"
 sh .macos
