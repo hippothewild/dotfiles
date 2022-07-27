@@ -45,25 +45,40 @@ EOF
 fi
 
 # Start screen saver after 1 minute idle time
-defaults -currentHost write com.apple.screensaver idleTime -int 60
+defaults write com.apple.screensaver idleTime -int 60
 
 # Requires password immediately after screen saver starts
 /usr/bin/profiles -I -F macos/askforpassworddelay.mobileconfig
 
-# Hot corner; Top left screen corner -> Do nothing
-defaults write com.apple.dock wvous-tl-corner -int 1
+# Hot corners
+# Possible values:
+#  0: no-op
+#  2: Mission Control
+#  3: Show application windows
+#  4: Desktop
+#  5: Start screen saver
+#  6: Disable screen saver
+#  7: Dashboard
+# 10: Put display to sleep
+# 11: Launchpad
+# 12: Notification Center
+# 13: Lock Screen
+# tl, tr, bl, br
+
+# Top left screen corner -> Do nothing
+defaults write com.apple.dock wvous-tl-corner -int 0
 defaults write com.apple.dock wvous-tl-modifier -int 0
 
-# Hot corner; Top right screen corner -> Disable screen saver
+# Top right screen corner -> Disable screen saver
 defaults write com.apple.dock wvous-tr-corner -int 6
 defaults write com.apple.dock wvous-tr-modifier -int 0
 
-# Hot corner; Bottom left screen corner -> Lock screen
+# Bottom left screen corner -> Lock screen
 defaults write com.apple.dock wvous-bl-corner -int 13
 defaults write com.apple.dock wvous-bl-modifier -int 0
 
-# Hot corner; Bottom right screen corner -> Do nothing
-defaults write com.apple.dock wvous-br-corner -int 1
+# Bottom right screen corner -> Do nothing
+defaults write com.apple.dock wvous-br-corner -int 0
 defaults write com.apple.dock wvous-br-modifier -int 0
 
 # ------
