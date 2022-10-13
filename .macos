@@ -44,8 +44,8 @@ if [ ! -f ~/Library/KeyBindings/DefaultkeyBinding.dict ]; then
 EOF
 fi
 
-# Start screen saver after 1 minute idle time
-defaults write com.apple.screensaver idleTime -int 60
+# Start screen saver after 3 minute idle time
+defaults write com.apple.screensaver idleTime -int 180
 
 # Requires password immediately after screen saver starts
 /usr/bin/profiles -I -F macos/askforpassworddelay.mobileconfig
@@ -69,16 +69,16 @@ defaults write com.apple.screensaver idleTime -int 60
 defaults write com.apple.dock wvous-tl-corner -int 0
 defaults write com.apple.dock wvous-tl-modifier -int 0
 
-# Top right screen corner -> Disable screen saver
-defaults write com.apple.dock wvous-tr-corner -int 6
+# Top right screen corner -> Lock screen
+defaults write com.apple.dock wvous-tr-corner -int 13
 defaults write com.apple.dock wvous-tr-modifier -int 0
 
 # Bottom left screen corner -> Do nothing
 defaults write com.apple.dock wvous-bl-corner -int 0
 defaults write com.apple.dock wvous-bl-modifier -int 0
 
-# Bottom right screen corner -> Lock screen
-defaults write com.apple.dock wvous-br-corner -int 13
+# Bottom right screen corner -> Disable screen saver
+defaults write com.apple.dock wvous-br-corner -int 6
 defaults write com.apple.dock wvous-br-modifier -int 0
 
 # ------
