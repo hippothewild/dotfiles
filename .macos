@@ -47,7 +47,7 @@ fi
 # Start screen saver after 3 minute idle time
 defaults write com.apple.screensaver idleTime -int 180
 
-# Requires password immediately after screen saver starts
+# Requires password 5 seconds after screen saver starts
 /usr/bin/profiles -I -F macos/askforpassworddelay.mobileconfig
 
 # Hot corners
@@ -69,8 +69,8 @@ defaults write com.apple.screensaver idleTime -int 180
 defaults write com.apple.dock wvous-tl-corner -int 0
 defaults write com.apple.dock wvous-tl-modifier -int 0
 
-# Top right screen corner -> Lock screen
-defaults write com.apple.dock wvous-tr-corner -int 13
+# Top right screen corner -> Start screen saver
+defaults write com.apple.dock wvous-tr-corner -int 5
 defaults write com.apple.dock wvous-tr-modifier -int 0
 
 # Bottom left screen corner -> Do nothing
