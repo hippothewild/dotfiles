@@ -64,11 +64,11 @@
   "git.ignoreMissingGitWarning": true,
   "github.copilot.enable": {
     "*": true,
-    "go": true,
-    "ini": false,
-    "markdown": false,
+    "yaml": true,
     "plaintext": false,
-    "yaml": true
+    "markdown": true,
+    "go": true,
+    "ini": false
   },
   "go.gopath": "/Users/jaychun/dev/go",
   "go.lintOnSave": "off",
