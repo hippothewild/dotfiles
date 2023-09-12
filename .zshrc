@@ -40,6 +40,9 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
 export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
 
+# vscode
+alias c='code'
+
 # Golang
 export GOPATH=$HOME/dev/go
 export GOROOT="$(brew --prefix golang)/libexec"
@@ -58,13 +61,14 @@ export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
 export KUBECONFIG=$(for i in $(find /Users/$USERNAME/.kube/kubeconfigs -iname '*.kubeconfig.yaml') ; do echo -n ":$i"; done | cut -c 2-)
 alias kubetoken='kubectl -n kube-utils get secret -o json | jq ".items[] | select(.metadata.name | contains(\"kubernetes-dashboard-token\"))" | jq -r ".data.token" | base64 --decode | pbcopy'
 alias k='kubectl'
+alias kx='kubectx'
 alias kns='kubens'
 
 # Misc aliases
 alias resetdns='sudo networksetup -setdnsservers en0 1.1.1.1 8.8.8.8'
 alias python='python3'
 alias pip='pip3'
-alias ls='exa'
+alias ls='eza'
 
 # Google Cloud SDK
 if [ -f "/Users/$USERNAME/Downloads/google-cloud-sdk/path.zsh.inc" ]; then . "/Users/$USERNAME/Downloads/google-cloud-sdk/path.zsh.inc"; fi

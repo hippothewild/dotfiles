@@ -41,7 +41,7 @@ brew "docker"
 # Disable dockutil until https://github.com/kcrawford/dockutil/issues/127 has fixed
 # brew "dockutil"
 brew "eksctl"
-brew "exa"
+brew "eza"
 brew "git"
 brew "go"
 brew "helm"
