@@ -22,7 +22,8 @@
   "[python]": {
     "editor.formatOnSave": true,
     "editor.insertSpaces": true,
-    "editor.tabSize": 4
+    "editor.tabSize": 4,
+    "editor.formatOnType": true
   },
   "[terraform]": {
     "editor.codeActionsOnSave": {
@@ -47,6 +48,7 @@
   "editor.fontSize": 15,
   "editor.inlineSuggest.enabled": true,
   "editor.tabSize": 2,
+  "editor.quickSuggestionsDelay": 10,
   "eslint.validate": [
     "typescript",
     "typescriptreact"
@@ -56,7 +58,6 @@
       "mode": "auto"
     }
   ],
-  "extensions.ignoreRecommendations": false,
   "files.eol": "\n",
   "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true,
@@ -88,14 +89,21 @@
     "--disable=W0614"
   ],
   "shellcheck.run": "onSave",
-  "tslint.alwaysShowRuleFailuresAsWarnings": true,
-  "tslint.autoFixOnSave": true,
-  "tslint.enable": true,
-  "tslint.run": "onSave",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "workbench.editorAssociations": {
     "*.ipynb": "jupyter-notebook"
   },
   "workbench.settings.editor": "json",
-  "security.workspace.trust.untrustedFiles": "open"
+  "security.workspace.trust.untrustedFiles": "open",
+  "githubPullRequests.pullBranch": "never",
+  "workbench.colorTheme": "Visual Studio Dark",
+	"extensions.ignoreRecommendations": true,
+	"gitlens.showWelcomeOnInstall": false,
+	"gitlens.showWhatsNewAfterUpgrades": false,
+	"redhat.telemetry.enabled": false,
+	"shellcheck.disableVersionCheck": true,
+	"telemetry.telemetryLevel": "off",
+	"update.showReleaseNotes": false,
+  "workbench.welcomePage.walkthroughs.openOnInstall": false,
+  "notebook.output.scrolling": true,
 }
