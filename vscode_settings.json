@@ -27,7 +27,7 @@
   },
   "[terraform]": {
     "editor.codeActionsOnSave": {
-      "source.formatAll.terraform": true
+      "source.formatAll.terraform": "explicit"
     },
     "editor.defaultFormatter": "hashicorp.terraform",
     "editor.formatOnSave": false
@@ -42,7 +42,7 @@
   },
   "editor.accessibilitySupport": "off",
   "editor.codeActionsOnSave": {
-    "source.fixAll": true
+    "source.fixAll": "explicit"
   },
   "editor.codeLens": false,
   "editor.fontSize": 15,
@@ -65,15 +65,19 @@
   "git.ignoreMissingGitWarning": true,
   "github.copilot.enable": {
     "*": true,
-    "yaml": true,
-    "plaintext": false,
+    "plaintext": true,
     "markdown": true,
+    "scminput": false,
+    "yaml": true,
     "go": true,
     "ini": false
   },
-  "go.gopath": "/Users/jaychun/dev/go",
+  "go.alternateTools": {
+      "go": "/opt/homebrew/bin/go"
+  },
   "go.lintOnSave": "off",
   "go.lintTool": "golangci-lint",
+  "go.testFlags": ["-v"],
   "go.toolsManagement.autoUpdate": true,
   "jupyter.askForKernelRestart": false,
   "latex-workshop.latex.autoBuild.interval": 5000,
@@ -85,10 +89,6 @@
     "jupyter-notebook": "left"
   },
   "python.analysis.typeCheckingMode": "basic",
-  "python.linting.pylintArgs": [
-    "--disable=W0614"
-  ],
-  "shellcheck.run": "onSave",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "workbench.editorAssociations": {
     "*.ipynb": "jupyter-notebook"
@@ -106,4 +106,5 @@
 	"update.showReleaseNotes": false,
   "workbench.welcomePage.walkthroughs.openOnInstall": false,
   "notebook.output.scrolling": true,
+  "github.copilot.editor.enableAutoCompletions": true,
 }
