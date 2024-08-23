@@ -21,7 +21,7 @@ source /Users/$USERNAME/.oh-my-zsh/oh-my-zsh.sh
 # custom prompt theme for oh-my-zsh
 function conditional_git_prompt() {
   if git rev-parse --git-dir > /dev/null 2>&1 ; then
-    echo " $(git_prompt_info)"
+    echo " $(_omz_git_prompt_info)"
   fi
 }
 PROMPT='%{$fg[yellow]%}$(shrink_path -l -t)%(?,,%{${fg_bold[white]}%} [%?]) %{$reset_color%}'
@@ -51,9 +51,6 @@ export PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 # jdk
 export PATH="/opt/homebrew/opt/openjdk/bin:$PATH"
 
-# asdf
-. /opt/homebrew/opt/asdf/libexec/asdf.sh
-
 # Node
 export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
 
@@ -77,3 +74,11 @@ if [ -f "/Users/$USERNAME/Downloads/google-cloud-sdk/completion.zsh.inc" ]; then
 # Autocompletion
 fpath+=~/.zfunc
 compinit
+
+# Mise (https://github.com/jdx/mise)
+eval "$(/Users/jaychun/.local/bin/mise activate zsh)"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
