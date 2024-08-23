@@ -12,9 +12,9 @@
     path = .gitconfig-vessl
 
 [alias]
-  lol = log --graph --decorate --pretty=format:'%C(yellow)%h %C(green)(%ar) %C(cyan)%an %C(bold white)|%C(reset) %C(white)%s%C(reset)%C(auto)%d%C(reset)' --abbrev-commit
   lola = log --graph --decorate --pretty=format:'%C(yellow)%h %C(green)(%ar) %C(cyan)%an %C(bold white)|%C(reset) %C(white)%s%C(reset)%C(auto)%d%C(reset)' --abbrev-commit --all
-  hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
+  main-branch = !git symbolic-ref refs/remotes/origin/HEAD | cut -d'/' -f4
+  fomo = !git fetch origin $(git main-branch) && git rebase origin/$(git main-branch) --autostash
 
 [pull]
 	rebase = false
