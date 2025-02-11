@@ -101,7 +101,7 @@ sudo defaults write /Library/Preferences/com.apple.dock autohide -bool YES
 defaults write com.apple.dock autohide -bool true
 
 # Set the icon size of Dock items
-defaults write com.apple.dock tilesize -int 72
+defaults write com.apple.dock tilesize -int 88
 
 # Remove the auto-hiding Dock delay
 defaults write com.apple.dock autohide-delay -float 0
@@ -111,18 +111,17 @@ defaults write com.apple.dock show-recents -bool false
 
 # Arrange applications on Dock
 dockutil --no-restart --remove all
-dockutil --no-restart --add "/Applications/Cron.app"
-dockutil --no-restart --add "/Applications/YT Music.app"
-dockutil --no-restart --add "/Applications/Visual Studio Code.app"
+dockutil --no-restart --add "/Applications/Notion Calendar.app"
 dockutil --no-restart --add "/Applications/Google Chrome.app"
-dockutil --no-restart --add "/Applications/iTerm.app"
+dockutil --no-restart --add "/Applications/Cursor.app"
+dockutil --no-restart --add "/Applications/WezTerm.app"
 dockutil --no-restart --add "/Applications/Notion.app"
-dockutil --no-restart --add "/System/Applications/Notes.app"
-dockutil --no-restart --add "/Applications/Slack.app"
 dockutil --no-restart --add "/Applications/Linear.app"
+dockutil --no-restart --add "/Applications/Slack.app"
+dockutil --no-restart --add "/System/Applications/Notes.app"
+dockutil --no-restart --add "/Applications/YT Music.app"
 dockutil --no-restart --add "/Applications/Between.app"
 dockutil --no-restart --add "/Applications/KakaoTalk.app"
-dockutil --no-restart --add "/Applications/feedly.app"
 
 # Kill affected apps
 for app in "Dock" "Finder"; do
