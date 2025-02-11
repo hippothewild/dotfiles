@@ -102,6 +102,8 @@ if [ -f "$HOME"/.vimrc ]; then
   cp "$HOME"/.vimrc "$HOME"/.vimrc.backup
 fi
 ln -nfs "$DOTFILE_DIR"/.vimrc "$HOME"/.vimrc
+mkdir -p "$HOME"/.config/wezterm
+ln -nfs "$DOTFILE_DIR"/wezterm.lua "$HOME"/.config/wezterm/wezterm.lua
 
 
 printmsg "All dotfiles setup completed!\nPlease logout/login to apply some system configurations."
