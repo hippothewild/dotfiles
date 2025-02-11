@@ -14,12 +14,11 @@ cask "adobe-digital-editions"
 cask "appcleaner"
 cask "beekeeper-studio"
 cask "calibre"
-cask "cron"
+cask "notion-calendar"
 cask "docker"
 cask "font-hack"
 cask "google-chrome"
 cask "google-cloud-sdk"
-cask "iterm2"
 cask "lens"
 cask "linear-linear"
 cask "mactex-no-gui"
@@ -32,16 +31,13 @@ cask "vlc"
 
 # Binaries / Libraries
 brew "ack"
-brew "protobuf"
-brew "grpc"
 brew "aws-iam-authenticator"
 brew "awscli"
-brew "circleci"
 brew "docker"
-# Disable dockutil until https://github.com/kcrawford/dockutil/issues/127 has fixed
-# brew "dockutil"
-brew "eksctl"
+brew "dockutil"
 brew "eza"
+brew "fd"
+brew "fzf"
 brew "git"
 brew "go"
 brew "helm"
@@ -58,8 +54,6 @@ brew "node@14"
 brew "openapi-generator"
 brew "postgresql"
 brew "pre-commit"
-brew "pyenv"
-brew "pyenv-virtualenv"
 brew "redis", restart_service: true
 brew "shellcheck"
 brew "terraform"
@@ -73,9 +67,7 @@ brew "stripe/stripe-cli/stripe"
 # Applications installed from Mac App Store https://github.com/mas-cli/mas
 mas "Between", id: 1320741520
 mas "Day One", id: 1055511498
-mas "feedly", id: 865500966
 mas "KakaoTalk", id: 869223134
 mas "Keynote", id: 409183694
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
-mas "Pocket", id: 568494494

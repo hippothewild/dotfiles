@@ -8,7 +8,7 @@ DISABLE_AUTO_TITLE="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git wd shrink-path kube-ps1)
+plugins=(fzf git kube-ps1 shrink-path wd)
 
 # User configuration about locale
 export LANG="en_US.UTF-8"
@@ -40,8 +40,8 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
 export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
 
-# vscode
-alias c='code'
+# Cursor
+alias c='cursor'
 
 # Golang
 export GOPATH=$HOME/dev/go
@@ -62,7 +62,6 @@ alias kx='kubectx'
 alias kns='kubens'
 
 # Misc aliases
-alias resetdns='sudo networksetup -setdnsservers en0 1.1.1.1 8.8.8.8'
 alias python='python3'
 alias pip='pip3'
 alias ls='eza'
@@ -77,6 +76,9 @@ compinit
 
 # Mise (https://github.com/jdx/mise)
 eval "$(/Users/jaychun/.local/bin/mise activate zsh)"
+
+# fzf
+export FZF_DEFAULT_COMMAND='fd — type f'
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
