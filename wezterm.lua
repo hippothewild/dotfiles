@@ -75,9 +75,16 @@ config.keys = {
   {mods = 'CMD', key = '[', action = action.ActivatePaneDirection('Prev')},
   {mods = 'CMD', key = ']', action = action.ActivatePaneDirection('Next')},
 
-  -- Word-by-word navigation
-  { mods = 'CMD', key = 'LeftArrow', action = action.SendKey { mods = 'ALT', key = 'b' } },
-  { mods = 'CMD', key = 'RightArrow', action = action.SendKey { mods = 'ALT', key = 'f' } },
+  -- Line navigation (Command + Arrow)
+  { mods = 'CMD', key = 'LeftArrow', action = action.SendKey { key = 'Home' } },
+  { mods = 'CMD', key = 'RightArrow', action = action.SendKey { key = 'End' } },
+
+  -- Word-by-word navigation (Option + Arrow)
+  { mods = 'ALT', key = 'LeftArrow', action = action.SendKey { mods = 'ALT', key = 'b' } },
+  { mods = 'ALT', key = 'RightArrow', action = action.SendKey { mods = 'ALT', key = 'f' } },
+
+  -- Word-by-word deletion
+  { mods = 'ALT', key = 'Backspace', action = action.SendKey { mods = 'ALT', key = 'Backspace' } },
 }
 
 -- Status bar
