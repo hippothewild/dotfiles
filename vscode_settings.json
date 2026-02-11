@@ -1,15 +1,18 @@
 {
+  "claudeCode.allowDangerouslySkipPermissions": true,
+  "claudeCode.initialPermissionMode": "bypassPermissions",
+  "claudeCode.useTerminal": false,
   "[go]": {
     "editor.formatOnSave": true,
-    "editor.insertSpaces": false
+    "editor.insertSpaces": false,
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "[markdown]": {
     "editor.acceptSuggestionOnEnter": "off",
@@ -17,46 +20,43 @@
     "editor.renderWhitespace": "all",
     "editor.tabSize": 2,
     "editor.wordWrap": "on",
-    "files.trimTrailingWhitespace": false
+    "files.trimTrailingWhitespace": false,
   },
   "[python]": {
     "editor.formatOnSave": true,
     "editor.insertSpaces": true,
     "editor.tabSize": 4,
-    "editor.formatOnType": true
+    "editor.formatOnType": true,
   },
   "[terraform]": {
     "editor.codeActionsOnSave": {
-      "source.formatAll.terraform": "explicit"
+      "source.formatAll.terraform": "explicit",
     },
     "editor.defaultFormatter": "hashicorp.terraform",
-    "editor.formatOnSave": false
+    "editor.formatOnSave": false,
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
   },
   "editor.accessibilitySupport": "off",
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit"
+    "source.fixAll": "explicit",
   },
   "editor.codeLens": false,
   "editor.fontSize": 15,
   "editor.inlineSuggest.enabled": true,
   "editor.tabSize": 2,
   "editor.quickSuggestionsDelay": 10,
-  "eslint.validate": [
-    "typescript",
-    "typescriptreact"
-  ],
+  "eslint.validate": ["typescript", "typescriptreact"],
   "eslint.workingDirectories": [
     {
-      "mode": "auto"
-    }
+      "mode": "auto",
+    },
   ],
   "files.eol": "\n",
   "files.insertFinalNewline": true,
@@ -70,10 +70,10 @@
     "scminput": false,
     "yaml": true,
     "go": true,
-    "ini": false
+    "ini": false,
   },
   "go.alternateTools": {
-      "go": "/opt/homebrew/bin/go"
+    "go": "/opt/homebrew/bin/go",
   },
   "go.lintOnSave": "off",
   "go.lintTool": "golangci-lint",
@@ -86,25 +86,40 @@
   "latex-workshop.view.pdf.viewer": "tab",
   "notebook.cellToolbarLocation": {
     "default": "right",
-    "jupyter-notebook": "left"
+    "jupyter-notebook": "left",
   },
   "python.analysis.typeCheckingMode": "basic",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "workbench.editorAssociations": {
-    "*.ipynb": "jupyter-notebook"
+    "*.ipynb": "jupyter-notebook",
   },
   "workbench.settings.editor": "json",
   "security.workspace.trust.untrustedFiles": "open",
   "githubPullRequests.pullBranch": "never",
   "workbench.colorTheme": "Visual Studio Dark",
-	"extensions.ignoreRecommendations": true,
-	"gitlens.showWelcomeOnInstall": false,
-	"gitlens.showWhatsNewAfterUpgrades": false,
-	"redhat.telemetry.enabled": false,
-	"shellcheck.disableVersionCheck": true,
-	"telemetry.telemetryLevel": "off",
-	"update.showReleaseNotes": false,
+  "extensions.ignoreRecommendations": true,
+  "gitlens.showWhatsNewAfterUpgrades": false,
+  "redhat.telemetry.enabled": false,
+  "shellcheck.disableVersionCheck": true,
+  "telemetry.telemetryLevel": "off",
+  "update.showReleaseNotes": false,
   "workbench.welcomePage.walkthroughs.openOnInstall": false,
   "notebook.output.scrolling": true,
-  "github.copilot.editor.enableAutoCompletions": true,
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "terminal.integrated.fontSize": 15,
+  "git.openRepositoryInParentFolders": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "[dockercompose]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced",
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+  },
+  "claudeCode.preferredLocation": "panel",
+  "claudeCode.selectedModel": "opus",
+  "yaml.maxItemsComputed": 10000,
+  "terminal.integrated.localEchoEnabled": "on",
 }
