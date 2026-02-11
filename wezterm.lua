@@ -91,12 +91,18 @@ config.keys = {
 wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_width)
   local pane = tab.active_pane
   local cwd = pane.current_working_dir
+  local title = pane.title
+  local is_shell = title:match("^zsh$") or title:match("^bash$") or title:match("^fish$") or title:match("^sh$")
+  local idx = tab.tab_index + 1
   if cwd then
     local cwd_path = cwd.file_path or ""
     local folder = cwd_path:match("([^/]+)/?$") or "~"
-    return { { Text = " " .. (tab.tab_index + 1) .. ": " .. folder .. " " } }
+    if is_shell then
+      return { { Text = " " .. idx .. ": " .. folder .. " " } }
+    end
+    return { { Text = " " .. idx .. ": " .. folder .. " | " .. title .. " " } }
   end
-  return { { Text = " " .. (tab.tab_index + 1) .. ": " .. pane.title .. " " } }
+  return { { Text = " " .. idx .. ": " .. title .. " " } }
 end)
 
 -- Status bar
