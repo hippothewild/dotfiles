@@ -87,6 +87,18 @@ config.keys = {
   { mods = 'ALT', key = 'Backspace', action = action.SendKey { mods = 'ALT', key = 'Backspace' } },
 }
 
+-- Tab title: show current directory name instead of process name
+wezterm.on('format-tab-title', function(tab, tabs, panes, config, hover, max_width)
+  local pane = tab.active_pane
+  local cwd = pane.current_working_dir
+  if cwd then
+    local cwd_path = cwd.file_path or ""
+    local folder = cwd_path:match("([^/]+)/?$") or "~"
+    return { { Text = " " .. (tab.tab_index + 1) .. ": " .. folder .. " " } }
+  end
+  return { { Text = " " .. (tab.tab_index + 1) .. ": " .. pane.title .. " " } }
+end)
+
 -- Status bar
 config.status_update_interval = 2000
 config.show_tabs_in_tab_bar = true
@@ -101,16 +113,16 @@ wezterm.on("update-status", function(window, pane)
   local success_cpu, stdout_cpu, stderr_cpu = wezterm.run_child_process({"sh", "-c", "top -l 1 | grep -E '^CPU' | awk '{print $3}'"})
   local cpu = success_cpu and stdout_cpu:gsub("\n", "") or "N/A"
 
-  -- Get memory usage
-  local success_mem, stdout_mem, stderr_mem = wezterm.run_child_process({"sh", "-c", "top -l 1 | grep -E '^PhysMem' | awk '{print $2}'"})
-  local memory = success_mem and stdout_mem:gsub("\n", "") or "N/A"
+  -- Get memory pressure (percentage)
+  local success_mem, stdout_mem, stderr_mem = wezterm.run_child_process({"sh", "-c", "echo $((100 - $(sysctl -n kern.memorystatus_level)))"})
+  local memory = success_mem and stdout_mem:gsub("%s+", "") .. "%" or "N/A"
 
   -- Set status bar text with colors
   window:set_right_status(wezterm.format({
     {Foreground = {Color = "#ff9e64"}},
     {Text = "CPU: " .. cpu .. "     "},
     {Foreground = {Color = "#9ece6a"}},
-    {Text = "MEM: " .. memory .. "     "},
+    {Text = "MemPress: " .. memory .. "     "},
     {Foreground = {Color = "#7aa2f7"}},
     {Text = date .. "       "},
   }))
