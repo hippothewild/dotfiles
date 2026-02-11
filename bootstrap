@@ -71,23 +71,8 @@ if [ -f "$HOME"/.zshrc ]; then
 fi
 ln -nfs "$DOTFILE_DIR"/.zshrc "$HOME"/.zshrc
 
-printmsg "*** Install Visual Studio Code extensions ***"
+printmsg "*** Install Visual Studio Code extensions (via brew bundle) ***"
 if test "$(which code)"; then
-  for ext in arcanis.vscode-zipfs \
-      dbaeumer.vscode-eslint \
-      eamodio.gitlens \
-      esbenp.prettier-vscode \
-      GitHub.copilot \
-      GitHub.vscode-pull-request-github \
-      golang.go \
-      hashicorp.terraform \
-      James-Yu.latex-workshop \
-      ms-python.python \
-      ms-vscode-remote.remote-ssh \
-      ms-vscode-remote.remote-ssh-edit \
-      timonwong.shellcheck; do
-    code --install-extension $ext
-  done
   if [ -f "$HOME"/Library/Application\ Support/Code/User/settings.json ]; then
     cp "$HOME"/Library/Application\ Support/Code/User/settings.json "$HOME"/Library/Application\ Support/Code/User/settings.json.backup
   fi
@@ -96,14 +81,23 @@ fi
 
 
 printmsg "*** Copy editor & terminal configurations ***"
-defaults write com.googlecode.iterm2.plist PrefsCustomFolder -string "$DOTFILE_DIR/iterm"
-defaults write com.googlecode.iterm2.plist LoadPrefsFromCustomFolder -bool true
 if [ -f "$HOME"/.vimrc ]; then
   cp "$HOME"/.vimrc "$HOME"/.vimrc.backup
 fi
 ln -nfs "$DOTFILE_DIR"/.vimrc "$HOME"/.vimrc
 mkdir -p "$HOME"/.config/wezterm
 ln -nfs "$DOTFILE_DIR"/wezterm.lua "$HOME"/.config/wezterm/wezterm.lua
+
+printmsg "*** Set Claude Code configurations ***"
+mkdir -p "$HOME"/.claude
+for f in settings.json permission-check.sh statusline-command.sh; do
+  if [ -f "$HOME"/.claude/"$f" ]; then
+    cp "$HOME"/.claude/"$f" "$HOME"/.claude/"$f".backup
+  fi
+  ln -nfs "$DOTFILE_DIR"/claude/"$f" "$HOME"/.claude/"$f"
+done
+chmod +x "$HOME"/.claude/permission-check.sh
+chmod +x "$HOME"/.claude/statusline-command.sh
 
 
 printmsg "All dotfiles setup completed!\nPlease logout/login to apply some system configurations."

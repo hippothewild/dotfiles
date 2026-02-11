@@ -113,7 +113,7 @@ defaults write com.apple.dock show-recents -bool false
 dockutil --no-restart --remove all
 dockutil --no-restart --add "/Applications/Notion Calendar.app"
 dockutil --no-restart --add "/Applications/Google Chrome.app"
-dockutil --no-restart --add "/Applications/Cursor.app"
+dockutil --no-restart --add "/Applications/Visual Studio Code.app"
 dockutil --no-restart --add "/Applications/WezTerm.app"
 dockutil --no-restart --add "/Applications/Notion.app"
 dockutil --no-restart --add "/Applications/Linear.app"
