@@ -40,8 +40,8 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}"
 export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:"
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
 
-# Cursor
-alias c='cursor'
+# VS Code
+alias c='code'
 
 # Golang
 export GOPATH=$HOME/dev/go
@@ -74,6 +74,17 @@ if [ -f "/Users/$USERNAME/Downloads/google-cloud-sdk/completion.zsh.inc" ]; then
 fpath+=~/.zfunc
 compinit
 
+# ssh hosts autocompletion
+zstyle ':completion:*:(ssh|scp|sftp):*' hosts off
+zstyle ':completion:*:(ssh|scp|sftp):*' users off
+zstyle ':completion:*:(ssh|scp|sftp):*' tag-order '!*'
+zstyle ':completion:*:(ssh|scp|sftp):argument-1:*' tag-order '!*'
+zstyle -e ':completion:*:(ssh|scp|sftp):*' hosts 'reply=()'
+zstyle -e ':completion:*:(ssh|scp|sftp):*' users 'reply=()'
+SSH_HOSTS=(${(f)"$(grep "^Host " ~/.ssh/config ~/.ssh/config.d/**/*.config 2>/dev/null | awk '{print $2}' | grep -v "*")"})
+_ssh_fast() { compadd -a SSH_HOSTS }
+compdef _ssh_fast ssh scp sftp
+
 # Mise (https://github.com/jdx/mise)
 eval "$(/Users/jaychun/.local/bin/mise activate zsh)"
 
@@ -84,3 +95,26 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 export PATH="/opt/homebrew/opt/node@20/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="/Users/jaychun/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+
+# moonrepo
+export PATH="$HOME/.moon/bin:$PATH"
+alias mx='moonx'
+function make() {
+  if [ -f ./moon.yml ]
+  then
+    echo "moon.yml found, Using moonx..."
+    mx "$*"
+  else
+    /usr/bin/make "$*"
+  fi
+}
+
+# Nebius CLI
+if [ -f '/Users/jaychun/.nebius/path.zsh.inc' ]; then source '/Users/jaychun/.nebius/path.zsh.inc'; fi
