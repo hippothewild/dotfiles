@@ -95,5 +95,7 @@ done
 chmod +x "$HOME"/.claude/permission-check.sh
 chmod +x "$HOME"/.claude/statusline-command.sh
 
+printmsg "*** Install global npm packages ***"
+npm install -g @anthropic-ai/claude-code @playwright/mcp
 
 printmsg "All dotfiles setup completed!\nPlease logout/login to apply some system configurations."
