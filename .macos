@@ -51,6 +51,19 @@ defaults write com.apple.screensaver idleTime -int 180
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 5
 
+# Prevent Wi-Fi from disconnecting during sleep/screen saver (AC power only)
+# This keeps network connections alive even when display is off
+sudo pmset -c tcpkeepalive 1
+
+# Prevent hard drive sleep (helps with network stability, AC power only)
+sudo pmset -c disksleep 0
+
+# Keep system awake for network access while display sleeps (AC power only)
+sudo pmset -c sleep 0
+
+# Only put display to sleep, not the whole system (AC power only)
+sudo pmset -c displaysleep 10
+
 # Hot corners
 # Possible values:
 #  0: no-op
