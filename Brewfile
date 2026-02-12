@@ -18,6 +18,7 @@ cask "adobe-digital-editions"
 cask "appcleaner"
 cask "beekeeper-studio"
 cask "calibre"
+cask "claude-code"
 cask "discord"
 cask "font-hack"
 cask "google-chrome"
@@ -64,6 +65,7 @@ brew "kubectx"
 brew "mactop"
 brew "mas"
 brew "minikube"
+brew "mise"
 brew "mockery"
 brew "mole"
 brew "mtr"
@@ -120,7 +122,7 @@ vscode "redhat.ansible"
 vscode "timonwong.shellcheck"
 
 # Applications installed from Mac App Store https://github.com/mas-cli/mas
-mas "Between", id: 1627676006
+mas "Between", id: 6743071205
 mas "Day One", id: 1055511498
 mas "KakaoTalk", id: 869223134
 mas "Keynote", id: 409183694

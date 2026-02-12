@@ -41,7 +41,7 @@ echo ""
 # ---------------------------------------------------------
 # 1. SSH keys & config
 # ---------------------------------------------------------
-echo "[1/5] Restoring SSH keys and config..."
+echo "[1/4] Restoring SSH keys and config..."
 if [ -d "$BACKUP_DIR/ssh" ]; then
   mkdir -p ~/.ssh
   cp -rn "$BACKUP_DIR/ssh/"* ~/.ssh/ 2>/dev/null || true
@@ -56,7 +56,7 @@ fi
 # ---------------------------------------------------------
 # 2. AWS config & credentials
 # ---------------------------------------------------------
-echo "[2/5] Restoring AWS config..."
+echo "[2/4] Restoring AWS config..."
 if [ -d "$BACKUP_DIR/aws" ]; then
   mkdir -p ~/.aws
   cp -rn "$BACKUP_DIR/aws/"* ~/.aws/ 2>/dev/null || true
@@ -67,32 +67,9 @@ else
 fi
 
 # ---------------------------------------------------------
-# 3. Chrome Bookmarks
+# 3. Terminal History
 # ---------------------------------------------------------
-echo "[3/5] Restoring Chrome bookmarks..."
-if [ -f "$BACKUP_DIR/chrome/Bookmarks.json" ]; then
-  CHROME_DIR="$HOME/Library/Application Support/Google/Chrome/Default"
-  if [ -d "$CHROME_DIR" ]; then
-    echo "  -> Chrome must be closed before restoring."
-    read -rp "  -> Is Chrome closed? (y/n): " confirm
-    if [ "$confirm" = "y" ]; then
-      cp "$BACKUP_DIR/chrome/Bookmarks.json" "$CHROME_DIR/Bookmarks"
-      echo "  -> Restored"
-    else
-      echo "  -> Skipped. To restore manually:"
-      echo "     cp $BACKUP_DIR/chrome/Bookmarks.json '$CHROME_DIR/Bookmarks'"
-    fi
-  else
-    echo "  -> Chrome profile directory not found. Launch Chrome once and try again."
-  fi
-else
-  echo "  -> No Chrome bookmarks backup found, skipping"
-fi
-
-# ---------------------------------------------------------
-# 4. Terminal History
-# ---------------------------------------------------------
-echo "[4/5] Restoring terminal history..."
+echo "[3/4] Restoring terminal history..."
 if [ -d "$BACKUP_DIR/shell" ]; then
   # Append to existing history
   if [ -f "$BACKUP_DIR/shell/.zsh_history" ]; then
@@ -110,10 +87,10 @@ else
 fi
 
 # ---------------------------------------------------------
-# 5. Restore misc config files
+# 4. Restore misc config files
 #    (only items NOT handled by dotfiles/bootstrap)
 # ---------------------------------------------------------
-echo "[5/5] Restoring misc config files..."
+echo "[4/4] Restoring misc config files..."
 if [ -d "$BACKUP_DIR/config" ]; then
   # gh (GitHub CLI)
   if [ -d "$BACKUP_DIR/config/gh" ]; then

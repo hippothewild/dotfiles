@@ -21,7 +21,7 @@ echo ""
 # ---------------------------------------------------------
 # 1. SSH keys & config
 # ---------------------------------------------------------
-echo "[1/5] Backing up SSH keys and config..."
+echo "[1/2] Backing up SSH keys and config..."
 mkdir -p "$BACKUP_DIR/ssh"
 cp -r ~/.ssh/config ~/.ssh/config.d "$BACKUP_DIR/ssh/" 2>/dev/null || true
 # Copy key files (exclude known_hosts)
@@ -37,38 +37,25 @@ echo "  -> $(find "$BACKUP_DIR/ssh/" -maxdepth 1 -type f | wc -l | tr -d ' ') fi
 # ---------------------------------------------------------
 # 2. AWS config & credentials
 # ---------------------------------------------------------
-echo "[2/5] Backing up AWS config..."
+echo "[2/4] Backing up AWS config..."
 mkdir -p "$BACKUP_DIR/aws"
 cp -r ~/.aws/config ~/.aws/credentials "$BACKUP_DIR/aws/" 2>/dev/null || true
 cp -r ~/.aws/cli ~/.aws/sso "$BACKUP_DIR/aws/" 2>/dev/null || true
 echo "  -> Done"
 
 # ---------------------------------------------------------
-# 3. Chrome Bookmarks
+# 3. Terminal History
 # ---------------------------------------------------------
-echo "[3/5] Backing up Chrome bookmarks..."
-mkdir -p "$BACKUP_DIR/chrome"
-CHROME_BOOKMARKS="$HOME/Library/Application Support/Google/Chrome/Default/Bookmarks"
-if [ -f "$CHROME_BOOKMARKS" ]; then
-  cp "$CHROME_BOOKMARKS" "$BACKUP_DIR/chrome/Bookmarks.json"
-  echo "  -> Bookmarks file backed up"
-else
-  echo "  -> Chrome Bookmarks file not found"
-fi
-
-# ---------------------------------------------------------
-# 4. Terminal History
-# ---------------------------------------------------------
-echo "[4/5] Backing up terminal history..."
+echo "[3/4] Backing up terminal history..."
 mkdir -p "$BACKUP_DIR/shell"
 cp ~/.zsh_history "$BACKUP_DIR/shell/" 2>/dev/null || true
 cp ~/.bash_history "$BACKUP_DIR/shell/" 2>/dev/null || true
 echo "  -> zsh_history: $(wc -l < ~/.zsh_history 2>/dev/null | tr -d ' ') lines"
 
 # ---------------------------------------------------------
-# 5. Misc config files (not handled by dotfiles/bootstrap)
+# 4. Misc config files (not handled by dotfiles/bootstrap)
 # ---------------------------------------------------------
-echo "[5/5] Backing up misc config files..."
+echo "[4/4] Backing up misc config files..."
 mkdir -p "$BACKUP_DIR/config"
 # gh (GitHub CLI auth tokens)
 cp -r ~/.config/gh "$BACKUP_DIR/config/gh" 2>/dev/null || true

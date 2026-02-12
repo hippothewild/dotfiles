@@ -48,7 +48,8 @@ fi
 defaults write com.apple.screensaver idleTime -int 180
 
 # Requires password 5 seconds after screen saver starts
-/usr/bin/profiles -I -F macos/askforpassworddelay.mobileconfig
+defaults write com.apple.screensaver askForPassword -int 1
+defaults write com.apple.screensaver askForPasswordDelay -int 5
 
 # Hot corners
 # Possible values:

@@ -39,16 +39,12 @@ fi
 printmsg "*** Install binaries and applications via Homebrew ***"
 export PATH="$PATH:/opt/homebrew/bin"
 brew update
-brew tap homebrew/bundle
-brew bundle --file="$DOTFILE_DIR"/Brewfile
+brew bundle -v --file="$DOTFILE_DIR"/Brewfile
 brew cleanup
 
-# Install dockutil from source https://github.com/kcrawford/dockutil/issues/127 has fixed
-printmsg "*** Install dockutils from source (https://github.com/kcrawford/dockutil/issues/127) ***"
-DOCKUTIL_URL=$(curl --silent "https://api.github.com/repos/kcrawford/dockutil/releases/latest" | jq -r .assets[].browser_download_url | grep pkg)
-curl -sL "${DOCKUTIL_URL}" -o /tmp/dockutil.pkg
-sudo installer -pkg "/tmp/dockutil.pkg" -target /
-rm /tmp/dockutil.pkg
+# dockutil is now available via brew
+printmsg "*** Install dockutil via Homebrew ***"
+brew install dockutil
 
 printmsg "*** Set macOS system configurations ***"
 sh .macos
