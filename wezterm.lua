@@ -58,7 +58,7 @@ config.window_padding = { left = '0.5cell', right = '0.5cell', top = '0.5cell', 
 config.default_cursor_style = 'SteadyBlock'
 
 -- Terminal configuration
-config.scrollback_lines = 10000
+config.scrollback_lines = 50000
 config.enable_scroll_bar = true
 config.enable_tab_bar = true
 config.use_fancy_tab_bar = true
@@ -111,27 +111,62 @@ config.show_tabs_in_tab_bar = true
 config.show_new_tab_button_in_tab_bar = false
 config.hide_tab_bar_if_only_one_tab = false
 
+-- Helper: pick color by usage percentage threshold
+local function usage_color(pct, low_color)
+  if pct >= 80 then return "#f7768e"
+  elseif pct >= 50 then return "#ff9e64"
+  else return low_color
+  end
+end
+
+-- Lua-level cache for Claude usage (refresh every 5 minutes)
+local usage_cache = { session = nil, weekly = nil, last_fetch = 0 }
+
 wezterm.on("update-status", function(window, pane)
-  -- Get current date/time
-  local date = wezterm.strftime("%a %b %-d %H:%M")
+  local home = os.getenv("HOME") or ""
 
   -- Get CPU usage
-  local success_cpu, stdout_cpu, stderr_cpu = wezterm.run_child_process({"sh", "-c", "top -l 1 | grep -E '^CPU' | awk '{print $3}'"})
-  local cpu = success_cpu and stdout_cpu:gsub("\n", "") or "N/A"
+  local success_cpu, stdout_cpu, _ = wezterm.run_child_process({"/bin/sh", "-c", "top -l 1 | grep -E '^CPU' | awk '{print $3}'"})
+  local cpu = success_cpu and stdout_cpu:gsub("%s+", "") or "N/A"
 
   -- Get memory pressure (percentage)
-  local success_mem, stdout_mem, stderr_mem = wezterm.run_child_process({"sh", "-c", "echo $((100 - $(sysctl -n kern.memorystatus_level)))"})
+  local success_mem, stdout_mem, _ = wezterm.run_child_process({"/bin/sh", "-c", "echo $((100 - $(sysctl -n kern.memorystatus_level)))"})
   local memory = success_mem and stdout_mem:gsub("%s+", "") .. "%" or "N/A"
 
-  -- Set status bar text with colors
-  window:set_right_status(wezterm.format({
-    {Foreground = {Color = "#ff9e64"}},
-    {Text = "CPU: " .. cpu .. "     "},
-    {Foreground = {Color = "#9ece6a"}},
-    {Text = "MemPress: " .. memory .. "     "},
-    {Foreground = {Color = "#7aa2f7"}},
-    {Text = date .. "       "},
-  }))
+  -- Get Claude usage limits (Lua cache: 5 min, script cache: 60s)
+  local now = os.time()
+  if now - usage_cache.last_fetch > 300 then
+    local usage_cmd = home .. "/.config/wezterm/claude-usage-cache.sh 2>/dev/null"
+    local success_usage, stdout_usage, _ = wezterm.run_child_process({"/bin/sh", "-l", "-c", usage_cmd})
+    if success_usage and stdout_usage and stdout_usage ~= "" then
+      local s_pct = stdout_usage:match('"five_hour":%s*{%s*"utilization":%s*([%d%.]+)')
+      local w_pct = stdout_usage:match('"seven_day":%s*{%s*"utilization":%s*([%d%.]+)')
+      usage_cache.session = tonumber(s_pct)
+      usage_cache.weekly = tonumber(w_pct)
+    end
+    usage_cache.last_fetch = now
+  end
+
+  -- Build status bar
+  local status = {}
+
+  table.insert(status, {Foreground = {Color = "#ff9e64"}})
+  table.insert(status, {Text = "CPU: " .. cpu .. "    "})
+
+  table.insert(status, {Foreground = {Color = "#9ece6a"}})
+  table.insert(status, {Text = "Mem: " .. memory .. "    "})
+
+  if usage_cache.session then
+    table.insert(status, {Foreground = {Color = usage_color(usage_cache.session, "#bb9af7")}})
+    table.insert(status, {Text = "Session: " .. string.format("%.0f", usage_cache.session) .. "%    "})
+  end
+
+  if usage_cache.weekly then
+    table.insert(status, {Foreground = {Color = usage_color(usage_cache.weekly, "#7aa2f7")}})
+    table.insert(status, {Text = "Weekly: " .. string.format("%.0f", usage_cache.weekly) .. "%    "})
+  end
+
+  window:set_right_status(wezterm.format(status))
 end)
 
 -- Additional configurations

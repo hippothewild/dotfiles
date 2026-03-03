@@ -28,7 +28,8 @@
       "Bash(gh pr:*)",
       "Bash(git worktree:*)",
       "Bash(tmux:*)",
-      "Bash(aws ec2 describe-vpcs:*)"
+      "Bash(aws ec2 describe-vpcs:*)",
+      "mcp__pencil"
     ],
     "deny": [],
     "ask": [],

@@ -3,6 +3,9 @@
 # Read JSON input from stdin
 input=$(cat)
 
+# Write session data to temp file for WezTerm status bar
+echo "$input" > /tmp/claude-code-session.json 2>/dev/null
+
 # Extract values
 cwd=$(echo "$input" | jq -r '.workspace.current_dir')
 model=$(echo "$input" | jq -r '.model.display_name')
