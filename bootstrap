@@ -83,6 +83,10 @@ fi
 ln -nfs "$DOTFILE_DIR"/.vimrc "$HOME"/.vimrc
 mkdir -p "$HOME"/.config/wezterm
 ln -nfs "$DOTFILE_DIR"/wezterm.lua "$HOME"/.config/wezterm/wezterm.lua
+ln -nfs "$DOTFILE_DIR"/claude/claude-usage-cache.sh "$HOME"/.config/wezterm/claude-usage-cache.sh
+chmod +x "$HOME"/.config/wezterm/claude-usage-cache.sh
+mkdir -p "$HOME"/.config/ghostty
+ln -nfs "$DOTFILE_DIR"/ghostty_config "$HOME"/.config/ghostty/config
 
 printmsg "*** Set Claude Code configurations ***"
 mkdir -p "$HOME"/.claude
@@ -97,5 +101,12 @@ chmod +x "$HOME"/.claude/statusline-command.sh
 
 printmsg "*** Install global npm packages ***"
 npm install -g @anthropic-ai/claude-code @playwright/mcp
+
+printmsg "*** Install moonrepo ***"
+if ! command -v moon &> /dev/null; then
+  bash <(curl -fsSL https://moonrepo.dev/install/moon.sh)
+else
+  printmsg "moonrepo is already installed"
+fi
 
 printmsg "All dotfiles setup completed!\nPlease logout/login to apply some system configurations."

@@ -1,0 +1,73 @@
+# Font configuration
+font-family = Hack
+font-size = 21
+font-feature = -calt
+font-feature = -clig
+font-feature = -liga
+adjust-cell-height = 15%
+adjust-cell-width = -10%
+
+# Colors (Tomorrow Night - matches wezterm.lua)
+background = 1d1f21
+foreground = c5c8c6
+
+# ANSI colors
+palette = 0=#000000
+palette = 1=#cc6666
+palette = 2=#b5bd68
+palette = 3=#f0c674
+palette = 4=#81a2be
+palette = 5=#b294bb
+palette = 6=#8abeb7
+palette = 7=#ffffff
+
+# Bright colors
+palette = 8=#000000
+palette = 9=#cc6666
+palette = 10=#b5bd68
+palette = 11=#f0c674
+palette = 12=#81a2be
+palette = 13=#b294bb
+palette = 14=#8abeb7
+palette = 15=#ffffff
+
+# Cursor
+cursor-color = c5c8c6
+cursor-text = 1d1f21
+cursor-style = block
+cursor-style-blink = false
+
+# Selection
+selection-background = 373b41
+selection-foreground = c5c8c6
+
+# Window
+macos-titlebar-style = native
+background-opacity = 0.92
+window-padding-x = 4
+window-padding-y = 4
+macos-window-shadow = true
+
+# Scrollback
+scrollback-limit = 50000
+
+# Keybindings - Split panes
+keybind = cmd+m=new_split:down
+keybind = cmd+l=new_split:right
+keybind = cmd+[=goto_split:previous
+keybind = cmd+]=goto_split:next
+
+# Keybindings - Line navigation
+keybind = cmd+left=text:\x01
+keybind = cmd+right=text:\x05
+
+# Keybindings - Word navigation
+keybind = alt+left=text:\x1bb
+keybind = alt+right=text:\x1bf
+
+# Keybindings - Word deletion
+keybind = alt+backspace=text:\x17
+
+# Splits
+unfocused-split-opacity = 0.85
+split-divider-color = #3e4451

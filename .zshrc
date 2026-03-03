@@ -171,3 +171,6 @@ zstyle -e ':completion:*:(ssh|scp|sftp):*' users 'reply=()'
 SSH_HOSTS=(${(f)"$(grep "^Host " ~/.ssh/config ~/.ssh/config.d/**/*.config 2>/dev/null | awk '{print $2}' | grep -v "*")"})
 _ssh_fast() { compadd -a SSH_HOSTS }
 compdef _ssh_fast ssh scp sftp
+
+# The next line updates PATH for Nebius CLI.
+if [ -f '/Users/jaychun/.nebius/path.zsh.inc' ]; then source '/Users/jaychun/.nebius/path.zsh.inc'; fi
