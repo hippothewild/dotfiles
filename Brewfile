@@ -44,6 +44,7 @@ brew "ack"
 brew "aws-iam-authenticator"
 brew "awscli"
 brew "azure-cli"
+brew "oven-sh/bun/bun"
 brew "circleci"
 brew "docker", link: false
 brew "eksctl"
