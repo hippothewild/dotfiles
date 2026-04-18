@@ -7,12 +7,21 @@ input=$(cat)
 # Pass-through for WezTerm status bar consumers
 echo "$input" > /tmp/claude-code-session.json 2>/dev/null
 
-cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // empty')
-model=$(echo "$input" | jq -r '.model.display_name // empty')
-output_style=$(echo "$input" | jq -r '.output_style.name // empty')
-agent=$(echo "$input" | jq -r '.agent.name // empty')
-vim_mode=$(echo "$input" | jq -r '.vim.mode // empty')
-transcript_path=$(echo "$input" | jq -r '.transcript_path // empty')
+# Parse all stdin fields in a single jq call. `read` collapses consecutive
+# whitespace in IFS, so we use a non-whitespace delimiter (\x1f, ASCII "unit
+# separator") to keep empty fields distinct.
+IFS=$'\x1f' read -r cwd model output_style agent vim_mode transcript_path _ < <(
+  echo "$input" | jq -j '
+    [
+      (.workspace.current_dir // .cwd // ""),
+      (.model.display_name // ""),
+      (.output_style.name // ""),
+      (.agent.name // ""),
+      (.vim.mode // ""),
+      (.transcript_path // ""),
+      "."
+    ] | join("\u001f")'
+)
 
 # Colors (256-color). DIM is readable on dark terminals unlike bright-black (90).
 C_RESET=$'\033[0m'
@@ -197,21 +206,17 @@ short_model() {
 context_pct() {
   local tp="$1" m="$2"
   [ -z "$tp" ] || [ ! -f "$tp" ] && return
-  # Window size: 1M if model label mentions "1M", else 200k default.
   local window=200000
   [[ "$m" == *"1M"* ]] && window=1000000
-  local usage
-  usage=$(tail -n 256 "$tp" 2>/dev/null \
-    | jq -c 'select(.message.usage != null) | .message.usage' 2>/dev/null \
-    | tail -n 1)
-  [ -z "$usage" ] && return
+  # Single jq pass: find the last entry with .message.usage and emit the token
+  # sum directly. No shell pipeline chain between jq calls.
   local tokens
-  tokens=$(echo "$usage" | jq -r '
-    (.input_tokens // 0) +
-    (.cache_creation_input_tokens // 0) +
-    (.cache_read_input_tokens // 0) +
-    (.output_tokens // 0)
-  ')
+  tokens=$(tail -n 256 "$tp" 2>/dev/null | jq -rs '
+    map(select(.message.usage != null)) | last as $e
+    | if $e == null then empty
+      else ($e.message.usage | (.input_tokens // 0) + (.cache_creation_input_tokens // 0) + (.cache_read_input_tokens // 0) + (.output_tokens // 0))
+      end
+  ' 2>/dev/null)
   [ -z "$tokens" ] || [ "$tokens" = "0" ] && return
   awk -v t="$tokens" -v w="$window" 'BEGIN{ printf "%d", (t * 100 / w) + 0.5 }'
 }
@@ -242,59 +247,75 @@ line1="$line1 $sep ${C_PATH}${short_path}${C_RESET}$(get_git_info)"
 # Lines 3-5: limits (session / weekly / sonnet) if cache available
 build_limits_block() {
   [ ! -f "$LIMITS_CACHE" ] && return
-  local data
-  data=$(cat "$LIMITS_CACHE" 2>/dev/null) || return
+
+  # Extract session+weekly util/reset in ONE jq call. Use \x1f delimiter since
+  # `read` collapses whitespace-class separators, which can drop empty fields.
+  local s_util s_reset w_util w_reset _
+  IFS=$'\x1f' read -r s_util s_reset w_util w_reset _ < <(
+    jq -j '
+      [
+        (.session.utilization // ""),
+        (.session.resets_at   // ""),
+        (.weekly.utilization  // ""),
+        (.weekly.resets_at    // ""),
+        "."
+      ] | join("\u001f")' "$LIMITS_CACHE" 2>/dev/null
+  )
 
   local rows=""
-  for key in session weekly; do
-    local util resets label
-    util=$(echo "$data" | jq -r ".${key}.utilization // empty")
-    resets=$(echo "$data" | jq -r ".${key}.resets_at // empty")
-    [ -z "$util" ] || [ "$util" = "null" ] && continue
-    local base_color
-    case "$key" in
-      session) label="Session"; base_color="$C_YELLOW" ;;
-      weekly)  label="Weekly "; base_color="$C_GREEN"  ;;
-    esac
-    # Override with red only when utilization is high enough to warrant warning.
-    local color bar left reset_str pct_int
+  _render_row() {
+    local util="$1" resets="$2" label="$3" base_color="$4"
+    [ -z "$util" ] && return
+    local pct_int color bar left reset_str line
     pct_int=${util%.*}
     if [ "$pct_int" -ge 80 ]; then color="$C_RED"; else color="$base_color"; fi
     bar=$(progress_bar "$util" "$color")
     left=$(printf "%.0f" "$util")
     reset_str=$(fmt_reset "$resets")
-    local line
     line=$(printf "  %s%s%s %s %s%3s%%%s" \
       "$C_DIM" "$label" "$C_RESET" "$bar" "$color" "$left" "$C_RESET")
     [ -n "$reset_str" ] && line="$line ${C_DIM}| Resets in $reset_str${C_RESET}"
     rows="${rows}${line}"$'\n'
-  done
+  }
+  _render_row "$s_util" "$s_reset" "Session" "$C_YELLOW"
+  _render_row "$w_util" "$w_reset" "Weekly " "$C_GREEN"
   printf "%s" "$rows"
 }
 
-# Line 6+: daily summary (today / yesterday / 30d)
+# Line 6+: daily summary (today / last 7d)
+# Token split used across all rows:
+#   cache  = cacheReadTokens              (reused from prompt cache)
+#   input  = inputTokens + cacheCreationTokens  (new input that hit the model)
+#   output = outputTokens
+# Display: "$593.25 | 698.3M tok (658.0M/39.6M/617.5K)"
 build_daily_block() {
   [ ! -f "$DAILY_CACHE" ] && return
 
-  # Token split used across all rows:
-  #   cache  = cacheReadTokens         (reused from prompt cache)
-  #   input  = inputTokens + cacheCreationTokens  (new input that hit the model,
-  #            whether or not it ended up creating a cache entry)
-  #   output = outputTokens
-  # Token format: "1.4B tokens (1.3B/55.0M/1.6M)"
-  #   total                   (cache / input / output)
-  fmt_row() {
-    local label="$1" row="$2"
-    [ -z "$row" ] || [ "$row" = "null" ] && return
-    local cost cache_t in_t out_t total_t
-    cost=$(echo "$row"  | jq -r '.totalCost // 0')
-    cache_t=$(echo "$row" | jq -r '.cacheReadTokens // 0')
-    in_t=$(echo "$row"    | jq -r '(.inputTokens // 0) + (.cacheCreationTokens // 0)')
-    out_t=$(echo "$row"   | jq -r '.outputTokens // 0')
+  # Single jq: today's totals + last-7d aggregates in one 8-field record.
+  local t_cost t_cache t_in t_out w_cost w_cache w_in w_out _
+  IFS=$'\x1f' read -r t_cost t_cache t_in t_out w_cost w_cache w_in w_out _ < <(
+    jq -j '
+      (.daily[-1] // null) as $today
+      | (.daily[-7:]) as $week
+      | [
+          ($today.totalCost // 0),
+          ($today.cacheReadTokens // 0),
+          (($today.inputTokens // 0) + ($today.cacheCreationTokens // 0)),
+          ($today.outputTokens // 0),
+          ([$week[] | .totalCost]           | add // 0),
+          ([$week[] | .cacheReadTokens]     | add // 0),
+          ([$week[] | ((.inputTokens // 0) + (.cacheCreationTokens // 0))] | add // 0),
+          ([$week[] | .outputTokens]        | add // 0),
+          "."
+        ] | map(tostring) | join("\u001f")
+    ' "$DAILY_CACHE" 2>/dev/null
+  )
+
+  _render_daily_row() {
+    local label="$1" cost="$2" cache_t="$3" in_t="$4" out_t="$5"
+    [ -z "$cost" ] && return
+    local total_t cost_str
     total_t=$((cache_t + in_t + out_t))
-    # Right-align the cost so the "$" column lines up across rows. We format
-    # "$1234.56" separately, then pad with spaces inside a fixed-width field.
-    local cost_str
     cost_str=$(printf "\$%.2f" "$cost")
     printf "  %s%-10s%s%s%22s%s %s| %s tok (%s/%s/%s)%s\n" \
       "$C_DIM" "$label" "$C_RESET" \
@@ -303,31 +324,18 @@ build_daily_block() {
       "$(human_num "$cache_t")" "$(human_num "$in_t")" "$(human_num "$out_t")" \
       "$C_RESET"
   }
-
-  local today
-  today=$(jq -r '.daily[-1] // empty' "$DAILY_CACHE" 2>/dev/null)
-  fmt_row "Today" "$today"
-
-  local last7
-  last7=$(jq -c '{
-    totalCost:           ([.daily[-7:][] | .totalCost]           | add // 0),
-    cacheReadTokens:     ([.daily[-7:][] | .cacheReadTokens]     | add // 0),
-    inputTokens:         ([.daily[-7:][] | .inputTokens]         | add // 0),
-    cacheCreationTokens: ([.daily[-7:][] | .cacheCreationTokens] | add // 0),
-    outputTokens:        ([.daily[-7:][] | .outputTokens]        | add // 0)
-  }' "$DAILY_CACHE" 2>/dev/null)
-  [ -n "$last7" ] && fmt_row "Last 7d" "$last7"
+  _render_daily_row "Today"   "$t_cost" "$t_cache" "$t_in" "$t_out"
+  _render_daily_row "Last 7d" "$w_cost" "$w_cache" "$w_in" "$w_out"
 }
 
 human_num() {
   local n="$1"
   [ -z "$n" ] && { echo "0"; return; }
-  awk -v n="$n" 'BEGIN{
-    if (n >= 1e9) printf "%.1fB", n/1e9;
-    else if (n >= 1e6) printf "%.1fM", n/1e6;
-    else if (n >= 1e3) printf "%.1fK", n/1e3;
-    else printf "%d", n;
-  }'
+  # Pure-bash: avoid forking awk per call. printf handles one-decimal rounding.
+  if   [ "$n" -ge 1000000000 ]; then printf "%.1fB" "$(( (n * 10 + 500000000) / 1000000000 ))e-1"
+  elif [ "$n" -ge 1000000    ]; then printf "%.1fM" "$(( (n * 10 + 500000)    / 1000000    ))e-1"
+  elif [ "$n" -ge 1000       ]; then printf "%.1fK" "$(( (n * 10 + 500)       / 1000       ))e-1"
+  else printf "%d" "$n"; fi
 }
 
 limits_block=$(build_limits_block)
