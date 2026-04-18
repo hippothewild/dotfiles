@@ -8,9 +8,15 @@ input=$(cat)
 echo "$input" > /tmp/claude-code-session.json 2>/dev/null
 
 # Parse all stdin fields in a single jq call. `read` collapses consecutive
-# whitespace in IFS, so we use a non-whitespace delimiter (\x1f, ASCII "unit
-# separator") to keep empty fields distinct.
-IFS=$'\x1f' read -r cwd model output_style agent vim_mode transcript_path _ < <(
+# whitespace in IFS, so we use \x1f (unit separator) to keep empty fields
+# distinct. Rate-limit and context fields were added by Claude Code v2.1.6+ —
+# when present they let us skip the OAuth usage endpoint and transcript
+# parsing entirely.
+IFS=$'\x1f' read -r \
+  cwd model output_style agent vim_mode transcript_path \
+  ctx_pct \
+  s_util s_reset_epoch w_util w_reset_epoch \
+  _ < <(
   echo "$input" | jq -j '
     [
       (.workspace.current_dir // .cwd // ""),
@@ -19,6 +25,11 @@ IFS=$'\x1f' read -r cwd model output_style agent vim_mode transcript_path _ < <(
       (.agent.name // ""),
       (.vim.mode // ""),
       (.transcript_path // ""),
+      (.context_window.used_percentage // ""),
+      (.rate_limits.five_hour.used_percentage // ""),
+      (.rate_limits.five_hour.resets_at // ""),
+      (.rate_limits.seven_day.used_percentage // ""),
+      (.rate_limits.seven_day.resets_at // ""),
       "."
     ] | join("\u001f")'
 )
@@ -133,25 +144,32 @@ refresh_daily() {
   release_lock "$lock"
 }
 
-if is_stale "$LIMITS_CACHE" "$LIMITS_TTL"; then
+# Only refresh the OAuth usage cache when stdin didn't deliver rate_limits —
+# v2.1.6+ carries the values directly, so the cache is dead weight on modern
+# clients. `refresh_daily` (ccusage) always runs: stdin carries no daily totals.
+if [ -z "$s_util" ] && [ -z "$w_util" ] && is_stale "$LIMITS_CACHE" "$LIMITS_TTL"; then
   (refresh_limits >/dev/null 2>&1 &) >/dev/null 2>&1
 fi
 if is_stale "$DAILY_CACHE" "$DAILY_TTL"; then
   (refresh_daily >/dev/null 2>&1 &) >/dev/null 2>&1
 fi
 
-# Format "resets in Nd Nh" / "Nh Nm" / "Nm"
+# Format "resets in Nd Nh" / "Nh Nm" / "Nm". Input can be either:
+#   - ISO-8601 string like "2026-04-18T06:00:00.432+00:00" (OAuth cache path)
+#   - Epoch seconds integer (stdin .rate_limits path)
 fmt_reset() {
-  local iso="$1"
-  [ -z "$iso" ] || [ "$iso" = "null" ] && { echo ""; return; }
+  local v="$1"
+  [ -z "$v" ] || [ "$v" = "null" ] && { echo ""; return; }
   local ts now diff d h m
-  # API returns UTC timestamps like "2026-04-18T06:00:00.432+00:00". Strip the
-  # fractional + offset portion and parse as UTC (-u) so local timezone doesn't
-  # get applied twice.
-  local iso_trim="${iso%%.*}"
-  iso_trim="${iso_trim%%+*}"
-  iso_trim="${iso_trim%Z}"
-  ts=$(date -j -u -f "%Y-%m-%dT%H:%M:%S" "$iso_trim" +%s 2>/dev/null) || { echo ""; return; }
+  if [[ "$v" =~ ^[0-9]+$ ]]; then
+    ts="$v"
+  else
+    # API returns UTC timestamps; strip fractional + offset and parse as UTC.
+    local iso_trim="${v%%.*}"
+    iso_trim="${iso_trim%%+*}"
+    iso_trim="${iso_trim%Z}"
+    ts=$(date -j -u -f "%Y-%m-%dT%H:%M:%S" "$iso_trim" +%s 2>/dev/null) || { echo ""; return; }
+  fi
   now=$(date +%s)
   diff=$((ts - now))
   [ $diff -le 0 ] && { echo "<1m"; return; }
@@ -200,16 +218,14 @@ short_model() {
   echo "$m"
 }
 
-# Read last usage entry from transcript and compute context% against the model's
-# window. Prints integer percent or empty if unavailable. Kept cheap: tail the
-# last 256 lines and grep in-process; full JSONL walk would be too slow.
-context_pct() {
+# Compute context% when stdin didn't provide it (older Claude Code versions).
+# Tail the last 256 lines of the transcript, take the last message.usage entry,
+# and ratio against the model's window. Returns empty if unavailable.
+context_pct_from_transcript() {
   local tp="$1" m="$2"
   [ -z "$tp" ] || [ ! -f "$tp" ] && return
   local window=200000
   [[ "$m" == *"1M"* ]] && window=1000000
-  # Single jq pass: find the last entry with .message.usage and emit the token
-  # sum directly. No shell pipeline chain between jq calls.
   local tokens
   tokens=$(tail -n 256 "$tp" 2>/dev/null | jq -rs '
     map(select(.message.usage != null)) | last as $e
@@ -232,7 +248,13 @@ ctx_color() {
 # Line 1: model | ctx% | path (main*) + decorations
 short_path=$(shorten_path "$cwd")
 model_short=$(short_model "${model:-Claude}")
-ctx=$(context_pct "$transcript_path" "${model:-}")
+# Prefer stdin .context_window.used_percentage (Claude Code v2.1.6+); otherwise
+# fall back to parsing the transcript.
+if [ -n "$ctx_pct" ]; then
+  ctx="$ctx_pct"
+else
+  ctx=$(context_pct_from_transcript "$transcript_path" "${model:-}")
+fi
 sep="${C_DIM}|${C_RESET}"
 
 line1="${C_BOLD_WHITE}${model_short}${C_RESET}"
@@ -244,23 +266,15 @@ line1="$line1 $sep ${C_PATH}${short_path}${C_RESET}$(get_git_info)"
 [ -n "$vim_mode" ] && line1="$line1 ${C_ACCENT}[$vim_mode]${C_RESET}"
 [ -n "$output_style" ] && [ "$output_style" != "default" ] && line1="$line1 ${C_GREEN}[$output_style]${C_RESET}"
 
-# Lines 3-5: limits (session / weekly / sonnet) if cache available
+# Render the session/weekly rate-limit rows. Data source is resolved upstream
+# (stdin .rate_limits > cached OAuth response). Each argument may be empty.
+#
+# Args: s_util s_reset w_util w_reset
+#   s_reset/w_reset can be an ISO-8601 timestamp OR an epoch seconds integer;
+#   fmt_reset handles both.
 build_limits_block() {
-  [ ! -f "$LIMITS_CACHE" ] && return
-
-  # Extract session+weekly util/reset in ONE jq call. Use \x1f delimiter since
-  # `read` collapses whitespace-class separators, which can drop empty fields.
-  local s_util s_reset w_util w_reset _
-  IFS=$'\x1f' read -r s_util s_reset w_util w_reset _ < <(
-    jq -j '
-      [
-        (.session.utilization // ""),
-        (.session.resets_at   // ""),
-        (.weekly.utilization  // ""),
-        (.weekly.resets_at    // ""),
-        "."
-      ] | join("\u001f")' "$LIMITS_CACHE" 2>/dev/null
-  )
+  local su="$1" sr="$2" wu="$3" wr="$4"
+  [ -z "$su$wu" ] && return
 
   local rows=""
   _render_row() {
@@ -277,9 +291,23 @@ build_limits_block() {
     [ -n "$reset_str" ] && line="$line ${C_DIM}| Resets in $reset_str${C_RESET}"
     rows="${rows}${line}"$'\n'
   }
-  _render_row "$s_util" "$s_reset" "Session" "$C_YELLOW"
-  _render_row "$w_util" "$w_reset" "Weekly " "$C_GREEN"
+  _render_row "$su" "$sr" "Session" "$C_YELLOW"
+  _render_row "$wu" "$wr" "Weekly " "$C_GREEN"
   printf "%s" "$rows"
+}
+
+# Read rate-limit values from the cached OAuth response. Used as fallback when
+# stdin doesn't carry .rate_limits (older Claude Code versions).
+read_limits_cache() {
+  [ ! -f "$LIMITS_CACHE" ] && return
+  jq -j '
+    [
+      (.session.utilization // ""),
+      (.session.resets_at   // ""),
+      (.weekly.utilization  // ""),
+      (.weekly.resets_at    // ""),
+      "."
+    ] | join("\u001f")' "$LIMITS_CACHE" 2>/dev/null
 }
 
 # Line 6+: daily summary (today / last 7d)
@@ -338,7 +366,14 @@ human_num() {
   else printf "%d" "$n"; fi
 }
 
-limits_block=$(build_limits_block)
+# Resolve rate-limit source: stdin .rate_limits (v2.1.6+) > cached OAuth JSON.
+# When stdin already has the values we skip the API call entirely — still kick
+# the background refresher for the cache-fallback path on older versions.
+if [ -z "$s_util" ] && [ -z "$w_util" ]; then
+  IFS=$'\x1f' read -r s_util s_reset_epoch w_util w_reset_epoch _ < <(read_limits_cache)
+  # epoch fields from cache are actually ISO strings; rename for clarity below.
+fi
+limits_block=$(build_limits_block "$s_util" "$s_reset_epoch" "$w_util" "$w_reset_epoch")
 daily_block=$(build_daily_block)
 
 printf "%s\n" "$line1"
