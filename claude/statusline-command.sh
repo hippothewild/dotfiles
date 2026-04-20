@@ -48,6 +48,7 @@ C_RED=$'\033[38;5;210m'       # pastel coral — high utilization
 C_MAGENTA=$'\033[35m'         # agent indicator
 C_BOLD_WHITE=$'\033[1;38;5;255m'  # bright white + bold — model name
 C_BLUE=$'\033[38;5;111m'          # pastel sky blue — context indicator
+C_HOTPINK=$'\033[1;38;5;198m'     # bold hot pink — extra-usage warning
 
 CACHE_DIR="${TMPDIR:-/tmp}"
 LIMITS_CACHE="$CACHE_DIR/claude-limits-cache.json"
@@ -121,6 +122,7 @@ refresh_limits() {
           session: .five_hour,
           weekly: .seven_day,
           sonnet: .seven_day_sonnet,
+          extra: .extra_usage,
           plan: $plan,
           fetched_at: ($ts | tonumber)
         }' > "$LIMITS_CACHE.tmp" 2>/dev/null && mv "$LIMITS_CACHE.tmp" "$LIMITS_CACHE"
@@ -144,11 +146,17 @@ refresh_daily() {
   release_lock "$lock"
 }
 
-# Only refresh the OAuth usage cache when stdin didn't deliver rate_limits —
-# v2.1.6+ carries the values directly, so the cache is dead weight on modern
-# clients. `refresh_daily` (ccusage) always runs: stdin carries no daily totals.
-if [ -z "$s_util" ] && [ -z "$w_util" ] && is_stale "$LIMITS_CACHE" "$LIMITS_TTL"; then
-  (refresh_limits >/dev/null 2>&1 &) >/dev/null 2>&1
+# Refresh the OAuth usage cache when either:
+#   (a) stdin didn't deliver rate_limits (older clients), OR
+#   (b) a 5h or weekly bucket has hit 100% — extra-usage credits are being
+#       drawn and we want to display them (stdin doesn't carry extra_usage).
+# refresh_daily (ccusage) always runs; stdin carries no daily totals.
+_limit_hit=0
+[ -n "$s_util" ] && [ "${s_util%.*}" -ge 100 ] && _limit_hit=1
+[ -n "$w_util" ] && [ "${w_util%.*}" -ge 100 ] && _limit_hit=1
+if { [ -z "$s_util" ] && [ -z "$w_util" ]; } || [ "$_limit_hit" = "1" ]; then
+  is_stale "$LIMITS_CACHE" "$LIMITS_TTL" && \
+    (refresh_limits >/dev/null 2>&1 &) >/dev/null 2>&1
 fi
 if is_stale "$DAILY_CACHE" "$DAILY_TTL"; then
   (refresh_daily >/dev/null 2>&1 &) >/dev/null 2>&1
@@ -269,11 +277,13 @@ line1="$line1 $sep ${C_PATH}${short_path}${C_RESET}$(get_git_info)"
 # Render the session/weekly rate-limit rows. Data source is resolved upstream
 # (stdin .rate_limits > cached OAuth response). Each argument may be empty.
 #
-# Args: s_util s_reset w_util w_reset
-#   s_reset/w_reset can be an ISO-8601 timestamp OR an epoch seconds integer;
-#   fmt_reset handles both.
+# Args: s_util s_reset w_util w_reset extra_suffix
+#   s_reset/w_reset: ISO-8601 timestamp or epoch seconds (fmt_reset handles both)
+#   extra_suffix:    pre-rendered "| Extra $X / $Y" string; appended only to
+#                    rows whose utilization has hit 100% (the buckets that are
+#                    actually drawing from extra credits).
 build_limits_block() {
-  local su="$1" sr="$2" wu="$3" wr="$4"
+  local su="$1" sr="$2" wu="$3" wr="$4" extra="${5:-}"
   [ -z "$su$wu" ] && return
 
   local rows=""
@@ -289,6 +299,7 @@ build_limits_block() {
     line=$(printf "  %s%s%s %s %s%3s%%%s" \
       "$C_DIM" "$label" "$C_RESET" "$bar" "$color" "$left" "$C_RESET")
     [ -n "$reset_str" ] && line="$line ${C_DIM}| Resets in $reset_str${C_RESET}"
+    [ -n "$extra" ] && [ "$pct_int" -ge 100 ] && line="$line $extra"
     rows="${rows}${line}"$'\n'
   }
   _render_row "$su" "$sr" "Session" "$C_YELLOW"
@@ -371,9 +382,32 @@ human_num() {
 # the background refresher for the cache-fallback path on older versions.
 if [ -z "$s_util" ] && [ -z "$w_util" ]; then
   IFS=$'\x1f' read -r s_util s_reset_epoch w_util w_reset_epoch _ < <(read_limits_cache)
-  # epoch fields from cache are actually ISO strings; rename for clarity below.
 fi
-limits_block=$(build_limits_block "$s_util" "$s_reset_epoch" "$w_util" "$w_reset_epoch")
+
+# If either bucket has hit 100%, pull extra_usage from the OAuth cache and
+# build the suffix "| Extra $X / $Y" (hot-pink, as a warning). The suffix is
+# rendered only on 100%+ rows by build_limits_block.
+extra_suffix=""
+if [ "$_limit_hit" = "1" ] && [ -f "$LIMITS_CACHE" ]; then
+  extra_enabled="" extra_used="" extra_limit=""
+  IFS=$'\x1f' read -r extra_enabled extra_used extra_limit _ < <(
+    jq -j '
+      [
+        (.extra.is_enabled // false | tostring),
+        (.extra.used_credits  // ""),
+        (.extra.monthly_limit // ""),
+        "."
+      ] | join("\u001f")' "$LIMITS_CACHE" 2>/dev/null
+  )
+  if [ "$extra_enabled" = "true" ] && [ -n "$extra_used" ] && [ -n "$extra_limit" ]; then
+    # API reports credits in cents (monthly_limit: 60000 = $600 on Max 20x).
+    used_dollars=$(awk -v c="$extra_used"  'BEGIN{ printf "%.2f", c/100 }')
+    lim_dollars=$(awk  -v c="$extra_limit" 'BEGIN{ printf "%.2f", c/100 }')
+    extra_suffix="${C_DIM}|${C_RESET} ${C_HOTPINK}Extra \$${used_dollars} / \$${lim_dollars}${C_RESET}"
+  fi
+fi
+
+limits_block=$(build_limits_block "$s_util" "$s_reset_epoch" "$w_util" "$w_reset_epoch" "$extra_suffix")
 daily_block=$(build_daily_block)
 
 printf "%s\n" "$line1"
