@@ -33,9 +33,8 @@
     ],
     "deny": [],
     "ask": [],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "auto"
   },
-  "model": "opus",
   "hooks": {
     "PermissionRequest": [
       {
@@ -65,5 +64,32 @@
     "linear-cli@linear-cli": true
   },
   "language": "한국어",
-  "alwaysThinkingEnabled": false
+  "alwaysThinkingEnabled": false,
+  "effortLevel": "medium",
+  "skipDangerousModePermissionPrompt": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
+  "extraKnownMarketplaces": {
+    "skillsmith": {
+      "source": {
+        "source": "github",
+        "repo": "jame581/skillsmith"
+      }
+    }
+  },
+  "skillOverrides": {
+    "godot-prompter:xr-development": "off",
+    "godot-prompter:multiplayer-sync": "off",
+    "godot-prompter:multiplayer-basics": "off",
+    "godot-prompter:dedicated-server": "off",
+    "godot-prompter:csharp-godot": "off",
+    "godot-prompter:csharp-signals": "off",
+    "godot-prompter:addon-development": "off",
+    "godot-prompter:dialogue-system": "off",
+    "godot-prompter:ai-navigation": "off",
+    "godot-prompter:procedural-generation": "off",
+    "godot-prompter:3d-essentials": "off",
+    "godot-prompter:localization": "off"
+  },
+  "skillListingBudgetFraction": 0.02
 }
