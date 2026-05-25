@@ -36,18 +36,18 @@ IFS=$'\x1f' read -r \
 
 # Colors (256-color). DIM is readable on dark terminals unlike bright-black (90).
 C_RESET=$'\033[0m'
-C_PATH=$'\033[33m'
-C_GIT=$'\033[34m'
-C_ACCENT=$'\033[36m'          # cyan — costs, primary values
+C_PATH=$'\033[38;5;179m'      # muted tan — cwd path
+C_GIT=$'\033[38;2;161;178;188m'   # dusty teal-blue — git branch (matches ctx)
+C_ACCENT=$'\033[38;5;108m'    # muted sage — costs, primary values
 C_LABEL=$'\033[38;5;252m'     # near-white — row labels
 C_DIM=$'\033[38;5;244m'       # medium gray — secondary info (visible on dark)
 C_MUTED=$'\033[38;5;240m'     # darker gray — empty progress dots
-C_GREEN=$'\033[38;5;114m'     # pastel sage green — weekly bar (and low util fallback)
-C_YELLOW=$'\033[38;5;222m'    # pastel cream/mustard — session bar (and medium util fallback)
-C_RED=$'\033[38;5;210m'       # pastel coral — high utilization
-C_MAGENTA=$'\033[35m'         # agent indicator
+C_GREEN=$'\033[38;2;176;173;139m'   # muted olive — weekly bar (and low util fallback)
+C_YELLOW=$'\033[38;2;214;184;152m'  # muted tan/gold — session bar (and medium util fallback)
+C_RED=$'\033[38;5;174m'       # dusty rose — high utilization
+C_MAGENTA=$'\033[38;5;139m'   # dusty mauve — agent indicator
 C_BOLD_WHITE=$'\033[1;38;5;255m'  # bright white + bold — model name
-C_BLUE=$'\033[38;5;111m'          # pastel sky blue — context indicator
+C_BLUE=$'\033[38;2;161;178;188m'      # dusty teal-blue — context indicator (matches git)
 C_HOTPINK=$'\033[1;38;5;198m'     # bold hot pink — extra-usage warning
 
 CACHE_DIR="${TMPDIR:-/tmp}"
