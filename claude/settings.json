@@ -61,7 +61,7 @@
           },
           {
             "type": "command",
-            "command": "$HOME/dev/personal/dotfiles/claudekeep/antml-format-reminder.sh"
+            "command": "$HOME/dev/personal/dotfiles/claude/hooks/antml-format-reminder.sh"
           }
         ]
       }
@@ -71,7 +71,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "$HOME/dev/personal/dotfiles/claudekeep/legacy-xml-guard.sh"
+            "command": "$HOME/dev/personal/dotfiles/claude/hooks/legacy-xml-guard.sh"
           }
         ]
       }

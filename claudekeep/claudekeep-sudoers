@@ -1,0 +1,2 @@
+# Allow claudekeep watchdog to toggle system sleep without password
+jaychun ALL=(root) NOPASSWD: /usr/bin/pmset
