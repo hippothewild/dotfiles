@@ -14,6 +14,12 @@ defaults write com.apple.AppleMultitouchTrackpad TrackpadThreeFingerDrag -int 1
 defaults write -g InitialKeyRepeat -int 15
 defaults write -g KeyRepeat -int 2
 
+# Disable text input "smart" features that interfere with typing
+# (Slack appends a stray "." otherwise via double-space-to-period)
+defaults write -g NSAutomaticPeriodSubstitutionEnabled -bool false
+defaults write -g NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write -g NSAutomaticDashSubstitutionEnabled -bool false
+
 # Change clock to 24-hour format
 defaults write com.apple.menuextra.clock IsAnalog -bool false
 defaults write com.apple.menuextra.clock DateFormat -string "EEE d MMM HH:mm"

@@ -55,6 +55,9 @@ export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}"
 # VS Code
 alias c='code'
 
+# Claude Code (skip permission prompts)
+alias cld='claude --dangerously-skip-permissions'
+
 # Golang
 export GOPATH=$HOME/dev/go
 export GOROOT="$(brew --prefix go)/libexec"
@@ -174,3 +177,4 @@ compdef _ssh_fast ssh scp sftp
 
 # The next line updates PATH for Nebius CLI.
 if [ -f '/Users/jaychun/.nebius/path.zsh.inc' ]; then source '/Users/jaychun/.nebius/path.zsh.inc'; fi
+export PATH="$HOME/.local/bin:$PATH"

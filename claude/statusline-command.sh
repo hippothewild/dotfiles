@@ -416,3 +416,7 @@ if [ -n "$limits_block" ] && [ -n "$daily_block" ]; then
   printf "  %s────────────────────────────────────────────────────%s\n" "$C_MUTED" "$C_RESET"
 fi
 [ -n "$daily_block" ] && printf "%s\n" "$daily_block"
+
+# Always exit clean — a trailing falsy test (e.g. empty daily_block) would
+# otherwise propagate exit code 1, which makes Claude Code drop the statusline.
+exit 0

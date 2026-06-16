@@ -1,6 +1,6 @@
 # Font configuration
 font-family = Hack
-font-size = 21
+font-size = 20
 # Pin Hangul to D2Coding so cmux's CJK font-codepoint-map auto-injection
 # (which force-maps Korean to Apple SD Gothic Neo) doesn't silently change on app update.
 # SF Mono / Hack have no Hangul glyphs; D2Coding is a Korean coding monospace.
@@ -12,29 +12,29 @@ font-feature = -liga
 adjust-cell-height = 15%
 adjust-cell-width = -10%
 
-# Colors (muted earthy variant of Tomorrow Night — matches statusline tones)
+# Colors (Tomorrow Night — matched to wezterm.lua palette)
 background = 1d1f21
 foreground = c5c8c6
 
 # ANSI colors
-palette = 0=#1d1f21
-palette = 1=#c98a8a
-palette = 2=#b0ad8b
-palette = 3=#d6b898
-palette = 4=#a1b2bc
-palette = 5=#b09bb8
-palette = 6=#9cb8b3
-palette = 7=#d8d8d2
+palette = 0=#000000
+palette = 1=#cc6666
+palette = 2=#b5bd68
+palette = 3=#f0c674
+palette = 4=#81a2be
+palette = 5=#b294bb
+palette = 6=#8abeb7
+palette = 7=#ffffff
 
 # Bright colors
-palette = 8=#4a4d52
-palette = 9=#c98a8a
-palette = 10=#b0ad8b
-palette = 11=#d6b898
-palette = 12=#a1b2bc
-palette = 13=#b09bb8
-palette = 14=#9cb8b3
-palette = 15=#e8e8e2
+palette = 8=#000000
+palette = 9=#cc6666
+palette = 10=#b5bd68
+palette = 11=#f0c674
+palette = 12=#81a2be
+palette = 13=#b294bb
+palette = 14=#8abeb7
+palette = 15=#ffffff
 
 # Cursor
 cursor-color = c5c8c6
