@@ -1,5 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "skillListingBudgetFraction": 0.02,
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
@@ -35,7 +36,56 @@
     "ask": [],
     "defaultMode": "auto"
   },
+  "model": "opus[1m]",
+  "skillOverrides": {
+    "godot-prompter:xr-development": "off",
+    "godot-prompter:multiplayer-sync": "off",
+    "godot-prompter:multiplayer-basics": "off",
+    "godot-prompter:dedicated-server": "off",
+    "godot-prompter:csharp-godot": "off",
+    "godot-prompter:csharp-signals": "off",
+    "godot-prompter:addon-development": "off",
+    "godot-prompter:dialogue-system": "off",
+    "godot-prompter:ai-navigation": "off",
+    "godot-prompter:procedural-generation": "off",
+    "godot-prompter:3d-essentials": "off",
+    "godot-prompter:localization": "off"
+  },
   "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/dev/personal/dotfiles/claudekeep/heartbeat.sh"
+          },
+          {
+            "type": "command",
+            "command": "$HOME/dev/personal/dotfiles/claudekeep/antml-format-reminder.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/dev/personal/dotfiles/claudekeep/legacy-xml-guard.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/dev/personal/dotfiles/claudekeep/heartbeat.sh"
+          }
+        ]
+      }
+    ],
     "PermissionRequest": [
       {
         "matcher": "Bash",
@@ -61,14 +111,9 @@
   "enabledPlugins": {
     "pr-review-toolkit@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
-    "linear-cli@linear-cli": true
+    "linear-cli@linear-cli": true,
+    "swift-lsp@claude-plugins-official": true
   },
-  "language": "한국어",
-  "alwaysThinkingEnabled": false,
-  "effortLevel": "medium",
-  "skipDangerousModePermissionPrompt": true,
-  "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
   "extraKnownMarketplaces": {
     "skillsmith": {
       "source": {
@@ -77,19 +122,10 @@
       }
     }
   },
-  "skillOverrides": {
-    "godot-prompter:xr-development": "off",
-    "godot-prompter:multiplayer-sync": "off",
-    "godot-prompter:multiplayer-basics": "off",
-    "godot-prompter:dedicated-server": "off",
-    "godot-prompter:csharp-godot": "off",
-    "godot-prompter:csharp-signals": "off",
-    "godot-prompter:addon-development": "off",
-    "godot-prompter:dialogue-system": "off",
-    "godot-prompter:ai-navigation": "off",
-    "godot-prompter:procedural-generation": "off",
-    "godot-prompter:3d-essentials": "off",
-    "godot-prompter:localization": "off"
-  },
-  "skillListingBudgetFraction": 0.02
+  "language": "한국어",
+  "alwaysThinkingEnabled": false,
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
 }
