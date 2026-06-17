@@ -97,8 +97,27 @@ is_stale() {
 
 # mkdir-based non-blocking lock (portable on macOS, unlike flock).
 # Usage: acquire_lock /path/to/lockdir || return 0
+#
+# A refresher that dies before release_lock (e.g. ccusage hangs, process is
+# reaped) would otherwise leave the lockdir behind forever — every later run
+# then fails the mkdir and skips the refresh, so the cache never updates again
+# (permanent deadlock). Guard against that two ways: callers trap-release on
+# exit, and here we reclaim a lockdir whose mtime is older than LOCK_STALE.
+LOCK_STALE=600   # 10 min — well past any legitimate refresh
 acquire_lock() {
-  mkdir "$1" 2>/dev/null
+  if mkdir "$1" 2>/dev/null; then
+    return 0
+  fi
+  # Held lock: reclaim it if it's stale (owner presumably died).
+  local mtime now
+  mtime=$(stat -f %m "$1" 2>/dev/null || echo 0)
+  now=$(date +%s)
+  if [ $((now - mtime)) -gt "$LOCK_STALE" ]; then
+    rmdir "$1" 2>/dev/null
+    mkdir "$1" 2>/dev/null
+    return
+  fi
+  return 1
 }
 release_lock() {
   rmdir "$1" 2>/dev/null
@@ -107,6 +126,8 @@ release_lock() {
 refresh_limits() {
   local lock="$LIMITS_CACHE.lock.d"
   acquire_lock "$lock" || return 0
+  # Release on any exit so a mid-refresh death can't leave a stale lock.
+  trap 'release_lock "$lock"' RETURN
 
   local creds token plan resp
   creds=$(security find-generic-password -s "Claude Code-credentials" -w 2>/dev/null)
@@ -129,21 +150,19 @@ refresh_limits() {
       fi
     fi
   fi
-
-  release_lock "$lock"
 }
 
 refresh_daily() {
   local lock="$DAILY_CACHE.lock.d"
   acquire_lock "$lock" || return 0
+  # Release on any exit so a mid-refresh death can't leave a stale lock.
+  trap 'release_lock "$lock"' RETURN
 
   local json
   json=$(bunx ccusage@latest daily --json 2>/dev/null)
   if [ -n "$json" ]; then
     echo "$json" > "$DAILY_CACHE.tmp" && mv "$DAILY_CACHE.tmp" "$DAILY_CACHE"
   fi
-
-  release_lock "$lock"
 }
 
 # Refresh the OAuth usage cache when either:
