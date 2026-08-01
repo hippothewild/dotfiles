@@ -204,12 +204,12 @@ def save_state(state, dry_run=False):
 # --------------------------------------------------------------------------
 
 def compute_project(dir_str):
-    """Return (project_name, project_root) for a workspace directory's git
-    project, or (None, None) if the directory isn't inside a git repo. The
-    main checkout and all of its worktrees (wherever they live on disk)
-    resolve to the same git-common-dir, so they always agree on a project."""
+    """Return the project name for a workspace directory's git project, or
+    None if the directory isn't inside a git repo. The main checkout and all
+    of its worktrees (wherever they live on disk) resolve to the same
+    git-common-dir, so they always agree on a project."""
     if not dir_str or not os.path.isdir(dir_str):
-        return None, None
+        return None
     try:
         proc = subprocess.run(
             ["git", "-C", dir_str, "rev-parse", "--path-format=absolute", "--git-common-dir"],
@@ -218,14 +218,13 @@ def compute_project(dir_str):
             timeout=GIT_TIMEOUT,
         )
     except (subprocess.TimeoutExpired, OSError):
-        return None, None
+        return None
     if proc.returncode != 0:
-        return None, None
+        return None
     common_dir = proc.stdout.strip()
     if not common_dir:
-        return None, None
-    root = Path(common_dir).parent
-    return root.name, str(root)
+        return None
+    return Path(common_dir).parent.name
 
 
 # --------------------------------------------------------------------------
@@ -316,24 +315,32 @@ def remove_from_group(wid, dry_run):
     return True
 
 
-def ungroup(gid, dry_run):
+def close_workspace(wid, dry_run):
     if dry_run:
-        log(f"[dry-run] would run: workspace-group ungroup {gid}")
+        log(f"[dry-run] would run: workspace close {wid}")
         return True
-    resp = run_cmux_json(["workspace-group", "ungroup", gid, "--json"])
+    resp = run_cmux_json(["workspace", "close", wid, "--json"])
     if resp is None:
-        log(f"ERROR: failed to ungroup empty group {gid}")
+        log(f"ERROR: failed to close workspace {wid}")
         return False
-    log(f"ungrouped empty group {gid}")
     return True
 
 
-def create_group(project, root, ids, dry_run):
+def create_group(project, ids, dry_run):
+    # `workspace-group create` always spawns a brand-new, empty workspace to
+    # be the group's anchor, in addition to adding the --from members --
+    # there's no flag to make it pick an existing member as anchor instead.
+    # This is deliberate, not worked around by promoting a real member to
+    # anchor: cmux's group header IS the anchor's own sidebar row (per
+    # `cmux workspace-group --help`), so an anchor that's a real session
+    # stops rendering as a normal, individually-clickable session item --
+    # you'd have to open the folder to reach it. Keeping the anchor as a
+    # dedicated empty placeholder keeps every real session a normal row.
+    # The tradeoff (the empty placeholder outliving every real session) is
+    # cleaned up in sweep(): once a managed group's only remaining member is
+    # its own anchor, we close it, which dissolves the group.
     if dry_run:
-        log(
-            f"[dry-run] would run: workspace-group create --name {project} "
-            f"--cwd {root} --from {','.join(ids)}"
-        )
+        log(f"[dry-run] would run: workspace-group create --name {project} --from {','.join(ids)}")
         for wid in ids:
             log(f"[dry-run] would assign workspace {wid} to new group for project {project}")
         return None
@@ -343,8 +350,6 @@ def create_group(project, root, ids, dry_run):
             "create",
             "--name",
             project,
-            "--cwd",
-            root,
             "--from",
             ",".join(ids),
             "--json",
@@ -357,7 +362,7 @@ def create_group(project, root, ids, dry_run):
     if not gid:
         log(f"ERROR: create group response missing id/ref for project {project}: {resp}")
         return None
-    log(f"created group {gid} for project {project} (cwd={root}) with members {ids}")
+    log(f"created group {gid} for project {project} with members {ids}")
     return gid
 
 
@@ -408,33 +413,31 @@ def sweep(dry_run=False):
         log(f"pruned assignment for closed workspace {wid}")
         del state["assignments"][wid]
 
-    # Dissolve managed groups that emptied out. Closing a group's anchor
-    # workspace normally dissolves the group on its own, but our own
-    # remove_from_group() calls below (re-filing a workspace whose cwd
-    # changed project) can strip the last member from a group via the live
-    # "remove" action rather than a workspace close, which can leave an
-    # empty group behind. Clean those up so a closed/re-filed project's
-    # folder doesn't linger in the sidebar.
+    # Close the empty placeholder anchor once every real session in a
+    # managed group has closed. create_group() never puts a real session in
+    # the anchor slot (see its comment), so a managed group down to exactly
+    # one member has nothing left but its own placeholder -- close it, which
+    # dissolves the group instead of leaving an empty folder in the sidebar.
     for gid, proj in list(state["managed_groups"].items()):
         group = groups_by_id.get(gid)
         if group is None:
             continue
         member_count = pick(group, "member_count", "memberCount") or 0
-        if member_count == 0:
-            log(f"managed group {gid} ({proj}) has 0 members; ungrouping")
-            ungroup(gid, dry_run)
+        if member_count == 1:
+            anchor_id = pick(group, "anchor_workspace_id", "anchorWorkspaceId")
+            if anchor_id:
+                log(f"managed group {gid} ({proj}) is down to just its placeholder anchor; closing it")
+                close_workspace(anchor_id, dry_run)
             state["managed_groups"].pop(gid, None)
+            state["assignments"].pop(anchor_id, None)
 
     candidates = {}  # project -> [workspace_id, ...]
-    project_roots = {}  # project -> root path
 
     for wid, w in workspaces_by_id.items():
         if wid in anchor_ids:
             continue
         dir_ = pick(w, "current_directory")
-        desired_project, desired_root = compute_project(dir_)
-        if desired_project:
-            project_roots.setdefault(desired_project, desired_root)
+        desired_project = compute_project(dir_)
         current_group_id = id_to_group.get(wid)
 
         # Enforce membership correctness for groups WE manage: a member whose
@@ -519,8 +522,7 @@ def sweep(dry_run=False):
             continue
 
         if len(ids) >= MIN_SESSIONS:
-            root = project_roots.get(project) or workspaces_by_id[ids[0]].get("current_directory")
-            new_gid = create_group(project, root, ids, dry_run)
+            new_gid = create_group(project, ids, dry_run)
             if new_gid:
                 set_icon(new_gid, dry_run)
                 state["managed_groups"][new_gid] = project
