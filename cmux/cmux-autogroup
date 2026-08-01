@@ -7,6 +7,11 @@ A workspace's project is derived from its cwd's `git rev-parse
 to the same `.git` path regardless of where the worktree lives on disk, so
 they land in the same group without any directory-naming convention.
 
+Each group's anchor is a placeholder cmux itself spawns (see create_group's
+docstring for why); watch mode also redirects selection to a real member the
+instant that placeholder gets clicked, so the folder behaves like a plain
+grouper rather than a session you can land on.
+
 Modes:
   cmux-autogroup sweep [--dry-run]   one reconciliation pass
   cmux-autogroup watch               sweep, then follow cmux events and
@@ -51,6 +56,12 @@ _ECHO_STDOUT = False
 
 # Held open for the process lifetime to keep the flock; see acquire_singleton_lock.
 _LOCK_FD = None
+
+# anchor_workspace_id -> a real member's workspace_id, refreshed at the end
+# of every sweep(). watch()'s event loop uses this to redirect selection
+# instantly when a placeholder anchor gets clicked, since the anchor itself
+# is an empty terminal nobody wants to land on. See select_workspace().
+_ANCHOR_REDIRECT = {}
 
 
 def find_cmux_bin():
@@ -326,6 +337,12 @@ def close_workspace(wid, dry_run):
     return True
 
 
+def select_workspace(wid):
+    # Live-only, no dry_run: only called from watch()'s event loop in
+    # response to a real selection event, never from sweep().
+    run_cmux(["workspace", "select", wid])
+
+
 def create_group(project, ids, dry_run):
     # `workspace-group create` always spawns a brand-new, empty workspace to
     # be the group's anchor, in addition to adding the --from members --
@@ -534,6 +551,36 @@ def sweep(dry_run=False):
                 f"have {len(ids)}, need {MIN_SESSIONS}"
             )
 
+    # Refresh the placeholder-anchor -> real-member redirect map watch() uses
+    # to bounce selection off an empty anchor the instant it's clicked. Built
+    # from this sweep's already-fetched group snapshot; a group created or
+    # grown during this same pass is covered on the next sweep instead
+    # (triggered within ~2s by that same create/add's own events), which is
+    # fine since nobody can click a group that didn't exist a moment ago.
+    redirect = {}
+    for gid in state["managed_groups"]:
+        group = groups_by_id.get(gid)
+        if not group:
+            continue
+        anchor_id = pick(group, "anchor_workspace_id", "anchorWorkspaceId")
+        members = (
+            pick(
+                group,
+                "member_workspace_ids",
+                "workspace_ids",
+                "members",
+                "member_workspace_refs",
+                "memberWorkspaceRefs",
+                "workspaceIds",
+            )
+            or []
+        )
+        reals = [m for m in members if m != anchor_id]
+        if anchor_id and reals:
+            redirect[anchor_id] = reals[0]
+    global _ANCHOR_REDIRECT
+    _ANCHOR_REDIRECT = redirect
+
     save_state(state, dry_run=dry_run)
 
 
@@ -561,7 +608,7 @@ def watch():
     while True:
         try:
             proc = subprocess.Popen(
-                [CMUX_BIN, "events", "--category", "workspace", "--reconnect"],
+                [CMUX_BIN, "events", "--category", "workspace", "--reconnect", "--no-heartbeat"],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL,
                 text=True,
@@ -603,7 +650,23 @@ def watch():
             if kind == "eof":
                 exited = True
                 break
-            pending_sweep = True
+
+            try:
+                event = json.loads(_payload)
+            except (json.JSONDecodeError, TypeError):
+                event = None
+
+            if event and event.get("type") == "event":
+                if event.get("name") == "workspace.selected":
+                    wid = event.get("workspace_id")
+                    target = _ANCHOR_REDIRECT.get(wid)
+                    if target:
+                        log(f"redirecting selection from placeholder anchor {wid} to {target}")
+                        try:
+                            select_workspace(target)
+                        except Exception as e:
+                            log(f"ERROR: failed to redirect selection to {target}: {e}")
+                pending_sweep = True
 
         try:
             proc.terminate()
