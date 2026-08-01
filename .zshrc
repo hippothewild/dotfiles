@@ -178,3 +178,4 @@ compdef _ssh_fast ssh scp sftp
 # The next line updates PATH for Nebius CLI.
 if [ -f '/Users/jaychun/.nebius/path.zsh.inc' ]; then source '/Users/jaychun/.nebius/path.zsh.inc'; fi
 export PATH="$HOME/.local/bin:$PATH"
+
