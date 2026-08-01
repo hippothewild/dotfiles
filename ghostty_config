@@ -1,6 +1,6 @@
 # Font configuration
 font-family = Hack
-font-size = 20
+font-size = 16
 # Pin Hangul to D2Coding so cmux's CJK font-codepoint-map auto-injection
 # (which force-maps Korean to Apple SD Gothic Neo) doesn't silently change on app update.
 # SF Mono / Hack have no Hangul glyphs; D2Coding is a Korean coding monospace.

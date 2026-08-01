@@ -11,7 +11,7 @@ config.font = wezterm.font {
   weight = 'Regular',
   harfbuzz_features = { 'calt=0', 'clig=0', 'liga=0' },
 }
-config.font_size = 22.0
+config.font_size = 16.0
 config.line_height = 1.15
 config.cell_width = 0.9
 
