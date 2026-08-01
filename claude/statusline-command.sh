@@ -4,8 +4,17 @@ set -u
 
 input=$(cat)
 
-# Pass-through for WezTerm status bar consumers
-echo "$input" > /tmp/claude-code-session.json 2>/dev/null
+# Persist the stdin snapshot per session. Multiple Claude Code sessions run
+# concurrently (e.g. a GLM-proxy session alongside Opus sessions in another
+# project); writing all of them to one shared file made each session's
+# context-window percentage overwrite the others, so the status line flickered
+# between different sessions' ctx values (e.g. 55% <-> 36%). Keying by
+# session_id gives each session its own file. A `claude-code-session.json`
+# symlink points at the most-recent one for any legacy consumer.
+_session_id=$(printf '%s' "$input" | jq -r '.session_id // ""' 2>/dev/null)
+_session_file="/tmp/claude-code-session-${_session_id:-default}.json"
+echo "$input" > "$_session_file" 2>/dev/null
+ln -sfn "$_session_file" /tmp/claude-code-session.json 2>/dev/null
 
 # Parse all stdin fields in a single jq call. `read` collapses consecutive
 # whitespace in IFS, so we use \x1f (unit separator) to keep empty fields
@@ -275,6 +284,25 @@ ctx_color() {
 # Line 1: model | ctx% | path (main*) + decorations
 short_path=$(shorten_path "$cwd")
 model_short=$(short_model "${model:-Claude}")
+# When pointed at a local translator/gateway (xclaude / anthropic-local-proxy /
+# kiro-gateway), Claude Code still reports its internal model id in stdin, not
+# the upstream model actually served. xclaude writes the real upstream model
+# to a per-session marker file; read it when the base URL is local.
+_alp_base_url="${ANTHROPIC_BASE_URL:-}"
+if [ -n "$_alp_base_url" ] && \
+   [[ "$_alp_base_url" == *"127.0.0.1"* || "$_alp_base_url" == *"localhost"* ]]; then
+  # Per-session marker (xclaude sets XCLAUDE_SESSION_MARKER); fall back to the
+  # legacy shared file so each session shows its own model+provider, not the
+  # last writer's.
+  _alp_marker="${XCLAUDE_SESSION_MARKER:-$HOME/.config/xclaude/active}"
+  if [ -f "$_alp_marker" ]; then
+    _alp_model=$(sed -n 's/^model=//p' "$_alp_marker" 2>/dev/null)
+    _alp_provider=$(sed -n 's/^provider=//p' "$_alp_marker" 2>/dev/null)
+    [ -n "$_alp_model" ] && model_short="$_alp_model"
+    # Append a provider tag like "(kiro)" / "(openai)" when known.
+    [ -n "$_alp_provider" ] && model_short="$_alp_model ($_alp_provider)"
+  fi
+fi
 # Prefer stdin .context_window.used_percentage (Claude Code v2.1.6+); otherwise
 # fall back to parsing the transcript.
 if [ -n "$ctx_pct" ]; then
