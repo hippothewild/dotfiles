@@ -47,7 +47,7 @@ CMUX_FALLBACK = "/Applications/cmux.app/Contents/Resources/bin/cmux"
 MIN_SESSIONS = 1  # minimum candidates for a project before we create a group
 CMUX_TIMEOUT = 10  # seconds, for every cmux subprocess call
 GIT_TIMEOUT = 5  # seconds, for every git subprocess call
-DEBOUNCE_SECONDS = 2.0
+DEBOUNCE_SECONDS = 0.3  # a sweep is ~150ms of local `cmux` CLI calls, not worth batching harder
 FORCE_SWEEP_INTERVAL = 60.0
 MAX_LOG_BYTES = 1024 * 1024
 
