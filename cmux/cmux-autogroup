@@ -316,6 +316,18 @@ def remove_from_group(wid, dry_run):
     return True
 
 
+def ungroup(gid, dry_run):
+    if dry_run:
+        log(f"[dry-run] would run: workspace-group ungroup {gid}")
+        return True
+    resp = run_cmux_json(["workspace-group", "ungroup", gid, "--json"])
+    if resp is None:
+        log(f"ERROR: failed to ungroup empty group {gid}")
+        return False
+    log(f"ungrouped empty group {gid}")
+    return True
+
+
 def create_group(project, root, ids, dry_run):
     if dry_run:
         log(
@@ -395,6 +407,23 @@ def sweep(dry_run=False):
     for wid in [w for w in state["assignments"] if w not in workspaces_by_id]:
         log(f"pruned assignment for closed workspace {wid}")
         del state["assignments"][wid]
+
+    # Dissolve managed groups that emptied out. Closing a group's anchor
+    # workspace normally dissolves the group on its own, but our own
+    # remove_from_group() calls below (re-filing a workspace whose cwd
+    # changed project) can strip the last member from a group via the live
+    # "remove" action rather than a workspace close, which can leave an
+    # empty group behind. Clean those up so a closed/re-filed project's
+    # folder doesn't linger in the sidebar.
+    for gid, proj in list(state["managed_groups"].items()):
+        group = groups_by_id.get(gid)
+        if group is None:
+            continue
+        member_count = pick(group, "member_count", "memberCount") or 0
+        if member_count == 0:
+            log(f"managed group {gid} ({proj}) has 0 members; ungrouping")
+            ungroup(gid, dry_run)
+            state["managed_groups"].pop(gid, None)
 
     candidates = {}  # project -> [workspace_id, ...]
     project_roots = {}  # project -> root path
