@@ -24,6 +24,22 @@
   // not pick it up.
   "automation": {
     "socketControlMode": "automation"
+  },
+
+  // macOS notifications otherwise all share a generic title ("Claude Code" /
+  // "Claude is waiting for input"), making it impossible to tell which
+  // session a banner is for at a glance. This hook rewrites the title to the
+  // sidebar workspace's own title (or the project dir name as a fallback)
+  // before the banner is shown. See cmux/cmux-notify-session-title and
+  // docs/notifications.md's "Notification Hooks" section.
+  "notifications": {
+    "hooks": [
+      {
+        "id": "session-title",
+        "command": "$HOME/dev/personal/dotfiles/cmux/cmux-notify-session-title",
+        "timeoutSeconds": 5
+      }
+    ]
   }
 
   // This file uses JSON with comments (JSONC).
