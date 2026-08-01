@@ -53,6 +53,16 @@
     "godot-prompter:localization": "off"
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/dev/personal/dotfiles/claude/hooks/cmux-xclaude-status.sh"
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [

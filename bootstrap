@@ -99,6 +99,22 @@ done
 chmod +x "$HOME"/.claude/permission-check.sh
 chmod +x "$HOME"/.claude/statusline-command.sh
 
+printmsg "*** Set cmux configurations ***"
+mkdir -p "$HOME"/.config/cmux
+if [ -f "$HOME"/.config/cmux/cmux.json ] && [ ! -L "$HOME"/.config/cmux/cmux.json ]; then
+  cp "$HOME"/.config/cmux/cmux.json "$HOME"/.config/cmux/cmux.json.backup
+fi
+ln -nfs "$DOTFILE_DIR"/cmux/cmux.json "$HOME"/.config/cmux/cmux.json
+mkdir -p "$HOME"/.local/bin
+chmod +x "$DOTFILE_DIR"/cmux/cmux-autogroup
+ln -nfs "$DOTFILE_DIR"/cmux/cmux-autogroup "$HOME"/.local/bin/cmux-autogroup
+mkdir -p "$HOME"/Library/LaunchAgents
+# launchd plists can't expand shell variables, so unlike the other symlinked
+# dotfiles this one is rendered from a __HOME__ template and copied in place.
+sed "s|__HOME__|$HOME|g" "$DOTFILE_DIR"/cmux/com.cmux.autogroup.plist > "$HOME"/Library/LaunchAgents/com.cmux.autogroup.plist
+launchctl bootout "gui/$(id -u)/com.cmux.autogroup" >/dev/null 2>&1 || true
+launchctl bootstrap "gui/$(id -u)" "$HOME"/Library/LaunchAgents/com.cmux.autogroup.plist
+
 printmsg "*** Install global npm packages ***"
 npm install -g @anthropic-ai/claude-code @playwright/mcp
 
