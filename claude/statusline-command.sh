@@ -22,7 +22,7 @@ ln -sfn "$_session_file" /tmp/claude-code-session.json 2>/dev/null
 # when present they let us skip the OAuth usage endpoint and transcript
 # parsing entirely.
 IFS=$'\x1f' read -r \
-  cwd model output_style agent vim_mode transcript_path \
+  cwd model model_id output_style agent vim_mode transcript_path \
   ctx_pct \
   s_util s_reset_epoch w_util w_reset_epoch \
   _ < <(
@@ -30,6 +30,7 @@ IFS=$'\x1f' read -r \
     [
       (.workspace.current_dir // .cwd // ""),
       (.model.display_name // ""),
+      (.model.id // ""),
       (.output_style.name // ""),
       (.agent.name // ""),
       (.vim.mode // ""),
@@ -297,10 +298,44 @@ if [ -n "$_alp_base_url" ] && \
   _alp_marker="${XCLAUDE_SESSION_MARKER:-$HOME/.config/xclaude/active}"
   if [ -f "$_alp_marker" ]; then
     _alp_model=$(sed -n 's/^model=//p' "$_alp_marker" 2>/dev/null)
-    _alp_provider=$(sed -n 's/^provider=//p' "$_alp_marker" 2>/dev/null)
+    # xclaude's marker "model=" line is already "<provider-name>/<model>" in
+    # multi-provider mode, so no separate provider-kind tag is appended here.
     [ -n "$_alp_model" ] && model_short="$_alp_model"
-    # Append a provider tag like "(kiro)" / "(openai)" when known.
-    [ -n "$_alp_provider" ] && model_short="$_alp_model ($_alp_provider)"
+    # A /model tier switch mid-session changes stdin's model.id on the very
+    # next render, but the marker above is written once at launch and never
+    # updated — so a switch from sonnet to opus kept showing the launch-time
+    # model. Resolve the CURRENT tier instead: strip xclaude's context-window
+    # suffix from model_id, then look it up as a borrowed alias
+    # ("alias.<id>=<provider>/<model>", written only for tiers that needed
+    # one). A tier with no borrowed alias already sends its real
+    # "provider/model" as model_id directly, so that case needs no lookup at
+    # all.
+    _alp_model_id="${model_id%\[1m\]}"
+    if [ -n "$_alp_model_id" ]; then
+      if [[ "$_alp_model_id" == */* ]]; then
+        model_short="$_alp_model_id"
+      else
+        _alp_alias=$(sed -n "s/^alias.${_alp_model_id}=//p" "$_alp_marker" 2>/dev/null)
+        [ -n "$_alp_alias" ] && model_short="$_alp_alias"
+      fi
+    fi
+    # cmux/hooks/cmux-xclaude-status.sh plants the "xclaude" sidebar pill
+    # ("🍚 <model>", once, from SessionStart) so xclaude-routed sessions are
+    # visually distinguishable from native-Anthropic ones. It never re-fires
+    # mid-session, so a /model tier switch left it showing the launch-time
+    # model forever. Refresh the SAME key/color/priority here instead of
+    # adding a second pill — this block re-runs on every status line render,
+    # so it's what keeps it live. Dedup against a cache file: the status line
+    # re-renders continuously, and `cmux set-status` is a socket round trip
+    # not worth paying when the value hasn't changed. Backgrounded so a
+    # slow/dead socket never adds latency to the status line itself.
+    if [ -n "${CMUX_WORKSPACE_ID:-}" ] && [ -n "$model_short" ] && command -v cmux >/dev/null 2>&1; then
+      _alp_cmux_cache="/tmp/claude-cmux-model-${_session_id:-default}.last"
+      if [ "$(cat "$_alp_cmux_cache" 2>/dev/null)" != "$model_short" ]; then
+        printf '%s' "$model_short" > "$_alp_cmux_cache" 2>/dev/null
+        (cmux set-status xclaude "🍚 ${model_short}" --color "#9B9B93" --priority 100 >/dev/null 2>&1 &)
+      fi
+    fi
   fi
 fi
 # Prefer stdin .context_window.used_percentage (Claude Code v2.1.6+); otherwise
