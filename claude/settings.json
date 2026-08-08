@@ -69,20 +69,6 @@
           {
             "type": "command",
             "command": "$HOME/dev/personal/dotfiles/claudekeep/heartbeat.sh"
-          },
-          {
-            "type": "command",
-            "command": "$HOME/dev/personal/dotfiles/claude/hooks/antml-format-reminder.sh"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "$HOME/dev/personal/dotfiles/claude/hooks/legacy-xml-guard.sh"
           }
         ]
       }
