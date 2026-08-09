@@ -50,6 +50,15 @@ else
   model=""
 fi
 
+# Bound the socket round-trip the same way cmux's own wrapper bounds its
+# startup ping (see cmux-claude-wrapper's cmux_socket_available): the CLI's
+# default response timeout is 15s, and an unbounded call here would block
+# this SessionStart hook for that long against a stale/slow socket — this
+# hook has no timeout of its own in settings.json, so it would otherwise ride
+# on Claude Code's default hook timeout instead of failing fast.
+CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=3
+export CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC
+
 if [ -n "$provider" ] && [ "$provider" != "anthropic" ]; then
   cmux set-status "$_key" "🍙 ${model:-xclaude}" --color "#9B9B93" --priority 100 >/dev/null 2>&1
 else

@@ -348,7 +348,14 @@ if [ -n "$_alp_base_url" ] && \
       _alp_cmux_cache="/tmp/claude-cmux-model-${CMUX_SURFACE_ID:-${_session_id:-default}}.last"
       if [ "$(cat "$_alp_cmux_cache" 2>/dev/null)" != "$model_short" ]; then
         printf '%s' "$model_short" > "$_alp_cmux_cache" 2>/dev/null
-        (cmux set-status "$_alp_cmux_key" "🍙 ${model_short}" --color "#9B9B93" --priority 100 >/dev/null 2>&1 &)
+        # Bounded the same way cmux's own wrapper bounds its startup ping
+        # (cmux-claude-wrapper's cmux_socket_available: CLI default is 15s).
+        # This fires on every render where the model changed, for the whole
+        # life of the session — an unbounded hang here against a stale socket
+        # would leave an orphaned `cmux` CLI process backgrounded under the
+        # claude process's tree for up to 15s at a time, including in the
+        # renders right up to shutdown.
+        (CMUXTERM_CLI_RESPONSE_TIMEOUT_SEC=3 cmux set-status "$_alp_cmux_key" "🍙 ${model_short}" --color "#9B9B93" --priority 100 >/dev/null 2>&1 &)
       fi
     fi
   fi
