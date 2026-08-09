@@ -320,7 +320,7 @@ if [ -n "$_alp_base_url" ] && \
       fi
     fi
     # cmux/hooks/cmux-xclaude-status.sh plants the "xclaude" sidebar pill
-    # ("🍚 <model>", once, from SessionStart) so xclaude-routed sessions are
+    # ("🍙 <model>", once, from SessionStart) so xclaude-routed sessions are
     # visually distinguishable from native-Anthropic ones. It never re-fires
     # mid-session, so a /model tier switch left it showing the launch-time
     # model forever. Refresh the SAME key/color/priority here instead of
@@ -329,11 +329,26 @@ if [ -n "$_alp_base_url" ] && \
     # re-renders continuously, and `cmux set-status` is a socket round trip
     # not worth paying when the value hasn't changed. Backgrounded so a
     # slow/dead socket never adds latency to the status line itself.
+    #
+    # The status key is per-pane ("xclaude:<surface_id>"), not a single
+    # workspace-level "xclaude" key. Two xclaude sessions sharing a cmux
+    # workspace (e.g. an opus-tier session in one project and a sonnet-tier
+    # session in another, both under the same workspace) used to clobber each
+    # other's pill — last statusline render won — so flipping /model in one
+    # showed the other's model. Per-pane keys give each its own pill.
+    #
+    # Keyed by CMUX_SURFACE_ID, not the Claude Code session_id, and must match
+    # cmux-xclaude-status.sh's key derivation exactly: session_id changes
+    # mid-pane on /clear, and if this block kept refreshing the OLD
+    # session-id-keyed pill while the SessionStart hook started a new one
+    # under the new session's id, the sidebar would show two pills for one
+    # pane instead of one.
+    _alp_cmux_key="xclaude:${CMUX_SURFACE_ID:-${_session_id:-default}}"
     if [ -n "${CMUX_WORKSPACE_ID:-}" ] && [ -n "$model_short" ] && command -v cmux >/dev/null 2>&1; then
-      _alp_cmux_cache="/tmp/claude-cmux-model-${_session_id:-default}.last"
+      _alp_cmux_cache="/tmp/claude-cmux-model-${CMUX_SURFACE_ID:-${_session_id:-default}}.last"
       if [ "$(cat "$_alp_cmux_cache" 2>/dev/null)" != "$model_short" ]; then
         printf '%s' "$model_short" > "$_alp_cmux_cache" 2>/dev/null
-        (cmux set-status xclaude "🍚 ${model_short}" --color "#9B9B93" --priority 100 >/dev/null 2>&1 &)
+        (cmux set-status "$_alp_cmux_key" "🍙 ${model_short}" --color "#9B9B93" --priority 100 >/dev/null 2>&1 &)
       fi
     fi
   fi
