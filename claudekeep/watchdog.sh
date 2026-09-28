@@ -20,7 +20,7 @@ is_active() {
 start_keepawake() {
     # caffeinate handles idle sleep. Spawn it only if not already running.
     if ! { [ -f "$PIDFILE" ] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; }; then
-        caffeinate -ims &
+        caffeinate -ims </dev/null >/dev/null 2>&1 &
         echo $! > "$PIDFILE"
         log "keepawake ON (caffeinate pid $(cat $PIDFILE))"
     fi
