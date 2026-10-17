@@ -1,3 +1,3 @@
 # Global instructions
 
-- When a multi-step task has a checkable end state (tests pass, build green, file contains X) and you would otherwise stop and wait for "continue", set your own `/goal` with the `self-goal` skill (cmux only). Skip it for tasks that finish in one turn.
+- Use the `self-goal` skill only when the user explicitly asks you to set a goal / keep going until done, or when the user's request itself is a complex multi-step task with a checkable end state (tests pass, build green, file contains X). Do not infer goals for ordinary or one-turn tasks. cmux only.

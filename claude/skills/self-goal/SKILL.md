@@ -1,6 +1,6 @@
 ---
 name: self-goal
-description: Set a /goal completion condition on this session yourself, so a Stop-hook evaluator keeps you working across turns until it holds. Use when the user asks you to set a goal, or when a long multi-step task has a checkable end state (tests pass, build green, file contains X) and you would otherwise stop and wait for "continue". Not for short tasks finishable in one turn. Requires running inside cmux.
+description: Set a /goal completion condition on this session yourself, so a Stop-hook evaluator keeps you working across turns until it holds. Use only when the user explicitly asks for a goal or to keep going until done, or when the user request itself is a complex multi-step task with a checkable end state (tests pass, build green, file contains X). Do not infer goals for ordinary or one-turn tasks. Requires running inside cmux.
 allowed-tools: Bash(${CLAUDE_SKILL_DIR}/scripts/set-goal.sh *)
 ---
 
