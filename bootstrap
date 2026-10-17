@@ -90,7 +90,7 @@ ln -nfs "$DOTFILE_DIR"/ghostty_config "$HOME"/.config/ghostty/config
 
 printmsg "*** Set Claude Code configurations ***"
 mkdir -p "$HOME"/.claude
-for f in settings.json permission-check.sh statusline-command.sh; do
+for f in settings.json permission-check.sh statusline-command.sh CLAUDE.md; do
   if [ -f "$HOME"/.claude/"$f" ]; then
     cp "$HOME"/.claude/"$f" "$HOME"/.claude/"$f".backup
   fi
