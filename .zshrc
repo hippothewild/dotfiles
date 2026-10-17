@@ -57,6 +57,53 @@ alias c='code'
 
 # Claude Code (skip permission prompts)
 alias cld='claude --dangerously-skip-permissions'
+alias clr='claude --resume'
+
+# Codex Remote in cmux: bypass server-side hooks; keep client-side OSC alerts.
+# Workaround for https://github.com/manaflow-ai/cmux/issues/14853
+# Explicit --remote is required: these -c options otherwise force embedded mode.
+function codex-remote() {
+  # --remote only supports the interactive TUI. Pass management/exec commands
+  # and explicitly selected transports through without the TUI defaults.
+  local arg skip_value=0
+  for arg in "$@"; do
+    if (( skip_value )); then
+      skip_value=0
+      continue
+    fi
+    case "$arg" in
+      --remote|--remote=*|--no-daemon|--help|-h|--version|-V|\
+      exec|e|review|login|logout|mcp|plugin|mcp-server|app-server|\
+      remote-control|app|completion|update|doctor|sandbox|debug|apply|a|\
+      queue|archive|delete|unarchive|migrate-rollouts|cloud|exec-server|features|help)
+        CMUX_CODEX_HOOKS_DISABLED=1 /Applications/cmux.app/Contents/Resources/bin/cmux-codex-wrapper "$@"
+        return $?
+        ;;
+      -c|--config|-m|--model|-p|--profile|-C|--cd|-a|--ask-for-approval|\
+      -s|--sandbox|-i|--image|--add-dir|--enable|--disable|--local-provider|--remote-auth-token-env)
+        skip_value=1 ;;
+      --) break ;;
+      -*) ;;
+      *) break ;;
+    esac
+  done
+  # --remote connects only; it does not auto-start the daemon. Always use the
+  # daemon's idempotent start command, which also handles stale socket links
+  # after reboot. A socket-file existence check cannot establish readiness.
+  CMUX_CODEX_HOOKS_DISABLED=1 /Applications/cmux.app/Contents/Resources/bin/cmux-codex-wrapper \
+    app-server daemon start >/dev/null || return $?
+
+  CMUX_CODEX_HOOKS_DISABLED=1 /Applications/cmux.app/Contents/Resources/bin/cmux-codex-wrapper \
+    --remote unix:// -C "$PWD" \
+    -c 'tui.notifications=true' \
+    -c 'tui.notification_method="osc9"' \
+    -c 'tui.notification_condition="always"' "$@"
+}
+
+# Use the Remote-compatible launch by default in cmux terminals.
+if [[ -n "${CMUX_SURFACE_ID:-}" ]]; then
+  alias codex='codex-remote'
+fi
 
 # Golang
 export GOPATH=$HOME/dev/go
@@ -179,4 +226,3 @@ compdef _ssh_fast ssh scp sftp
 # The next line updates PATH for Nebius CLI.
 if [ -f '/Users/jaychun/.nebius/path.zsh.inc' ]; then source '/Users/jaychun/.nebius/path.zsh.inc'; fi
 export PATH="$HOME/.local/bin:$PATH"
-
