@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """cmux-autogroup: auto-organize cmux workspaces into native sidebar
-workspace groups, one group per git project.
+workspace groups, one group per git project (or, for a cwd outside any git
+repo, one group per resolved directory).
 
 A workspace's project is derived from its cwd's `git rev-parse
 --git-common-dir`: the main checkout and every one of its worktrees resolve
 to the same `.git` path regardless of where the worktree lives on disk, so
-they land in the same group without any directory-naming convention.
+they land in the same group without any directory-naming convention. When
+the cwd isn't inside a git repo at all, we fall back to the cwd's own
+resolved (symlink-free) path, so two workspaces opened on the exact same
+plain folder still group together, just without the worktree-spanning
+behavior git projects get.
 
 Each group's anchor is a placeholder cmux itself spawns (see create_group's
 docstring for why); watch mode also redirects selection to a real member the
@@ -215,10 +220,13 @@ def save_state(state, dry_run=False):
 # --------------------------------------------------------------------------
 
 def compute_project(dir_str):
-    """Return the project name for a workspace directory's git project, or
-    None if the directory isn't inside a git repo. The main checkout and all
-    of its worktrees (wherever they live on disk) resolve to the same
-    git-common-dir, so they always agree on a project."""
+    """Return the project name for a workspace directory: its git project
+    name when the cwd is inside a git repo (the main checkout and all of its
+    worktrees, wherever they live on disk, resolve to the same
+    git-common-dir, so they always agree on a project), otherwise the
+    resolved directory's own basename. Returns None only when the directory
+    itself doesn't exist, so a plain (non-git) folder is now in scope too --
+    it just groups by exact resolved path instead of spanning worktrees."""
     if not dir_str or not os.path.isdir(dir_str):
         return None
     try:
@@ -229,13 +237,18 @@ def compute_project(dir_str):
             timeout=GIT_TIMEOUT,
         )
     except (subprocess.TimeoutExpired, OSError):
+        proc = None
+    if proc is not None and proc.returncode == 0:
+        common_dir = proc.stdout.strip()
+        if common_dir:
+            return Path(common_dir).parent.name
+    # Not a git repo (or the git lookup failed) -- fall back to the cwd's
+    # own resolved name so identical-directory sessions still group.
+    try:
+        resolved = Path(dir_str).resolve()
+    except OSError:
         return None
-    if proc.returncode != 0:
-        return None
-    common_dir = proc.stdout.strip()
-    if not common_dir:
-        return None
-    return Path(common_dir).parent.name
+    return resolved.name
 
 
 # --------------------------------------------------------------------------
@@ -478,7 +491,7 @@ def sweep(dry_run=False):
             continue
 
         if desired_project is None:
-            continue  # out of scope (not a git repo)
+            continue  # out of scope (directory no longer exists)
 
         assignment = state["assignments"].get(wid)
 
