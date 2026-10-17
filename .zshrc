@@ -82,9 +82,10 @@ fi
 # Kubernetes
 # ============================================================================
 
-# Kubeconfig - merge all config files from ~/.kube/kubeconfigs
-if [ -d "$HOME/.kube/kubeconfigs" ]; then
-  export KUBECONFIG=$(find "$HOME/.kube/kubeconfigs" -iname '*.kubeconfig.yaml' -exec echo -n ":{}" \; | cut -c 2-)
+# Kubeconfig - merge all config files from ~/.kube/configs (also written to
+# by support-toolkit's `kc` for clusters it manages, e.g. `kc -c capella`)
+if [ -d "$HOME/.kube/configs" ]; then
+  export KUBECONFIG=$(find "$HOME/.kube/configs" -iname '*.kubeconfig.yaml' -exec echo -n ":{}" \; | cut -c 2-)
 fi
 
 # Kubernetes aliases
