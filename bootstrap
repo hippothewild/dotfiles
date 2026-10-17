@@ -98,6 +98,9 @@ for f in settings.json permission-check.sh statusline-command.sh; do
 done
 chmod +x "$HOME"/.claude/permission-check.sh
 chmod +x "$HOME"/.claude/statusline-command.sh
+mkdir -p "$HOME"/.claude/skills
+chmod +x "$DOTFILE_DIR"/claude/skills/self-goal/scripts/set-goal.sh
+ln -nfs "$DOTFILE_DIR"/claude/skills/self-goal "$HOME"/.claude/skills/self-goal
 
 printmsg "*** Set cmux configurations ***"
 mkdir -p "$HOME"/.config/cmux
