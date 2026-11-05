@@ -98,6 +98,18 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/dev/personal/dotfiles/claude/hooks/block-pkill-trailing-option.py",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
