@@ -30,8 +30,7 @@
       "Bash(gh pr:*)",
       "Bash(git worktree:*)",
       "Bash(tmux:*)",
-      "Bash(aws ec2 describe-vpcs:*)",
-      "mcp__pencil"
+      "Bash(aws ec2 describe-vpcs:*)"
     ],
     "deny": [],
     "ask": [],
@@ -128,5 +127,8 @@
   "skipWorkflowUsageWarning": true,
   "theme": "auto",
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "disabledMcpjsonServers": [
+    "pencil"
+  ]
 }
